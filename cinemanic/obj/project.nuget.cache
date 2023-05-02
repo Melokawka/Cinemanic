@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "6atqZcd+14aT44rKy2COz5CR2QIo/X4GL/D1TyDHog/ssSqh9ysPVLuBBnxbkqkH2/m1Yx4M7kq/745gKlaXjg==",
+  "success": true,
+  "projectFilePath": "E:\\Kino\\cinemanic\\cinemanic.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Jamistrz\\.nuget\\packages\\microsoft.visualstudio.azure.containers.tools.targets\\1.17.2\\microsoft.visualstudio.azure.containers.tools.targets.1.17.2.nupkg.sha512"
+  ],
+  "logs": []
+}
