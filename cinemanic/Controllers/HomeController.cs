@@ -1,39 +1,123 @@
 ﻿using cinemanic.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Hosting;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using Microsoft.AspNetCore.Cors;
-using System.Net;
+using cinemanic.Data;
+using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
+using Newtonsoft.Json.Linq;
 
 namespace cinemanic.Controllers
 {
     [EnableCors("AllowWordPressApi")]
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
+        private readonly CinemanicDbContext _dbContext;
+        public HomeController(CinemanicDbContext dbContext)
         {
-            _logger = logger;
+            _dbContext = dbContext;
+        }
+
+        [HttpGet]
+        public IActionResult GetAllMovies()
+        {
+            var movies = _dbContext.Movies.ToList();
+
+            return Ok(movies);
+        }
+
+        public async Task<List<Post>> GetPostsAsync(string apiEndpoint)
+        {
+            using (HttpClient client = new())
+            {
+                HttpResponseMessage response = await client.GetAsync(apiEndpoint);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string jsonResponse = await response.Content.ReadAsStringAsync();
+
+                    var posts = JsonConvert.DeserializeObject<List<Post>>(jsonResponse);
+                    return posts;
+                }
+                else
+                {
+                    // handle error
+                    return null;
+                }
+            }
+        }
+
+        public static string FindTrailerKey(string json)
+        {
+            var jObject = JObject.Parse(json);
+            var jArray = (JArray)jObject["results"];
+
+            foreach (var item in jArray)
+            {
+                var type = (string)item["type"];
+                if (type == "Trailer")
+                {
+                    return (string)item["key"];
+                }
+            }
+
+            return null;
         }
 
         public async Task<IActionResult> Index()
         {
             string apiEndpoint = "http://127.0.0.1:8080/wordpress/wp-json/wp/v2/posts";
 
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(apiEndpoint);
-            request.Method = "GET";
-            request.ContentType = "application/json";
+            Random random = new Random();
+            int movieId;
+            string apiEndpoint2;
+            string apiEndpoint3;
+            HttpResponseMessage response2;
 
-            WebResponse response = await request.GetResponseAsync();
-            StreamReader reader = new StreamReader(response.GetResponseStream());
-            string jsonResponse = reader.ReadToEnd();
+            //string apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
+            //string apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
+            
+            var httpClient = new HttpClient();
 
-            List<Post> posts = new List<Post>();
-            posts = JsonConvert.DeserializeObject<List<Post>>(jsonResponse);
+            do
+            {
+                movieId = random.Next(10000, 100001);
+                Console.WriteLine(movieId);
+                apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
+                apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
 
-            if (posts.Count > 0) return View(posts);
+                response2 = await httpClient.GetAsync(apiEndpoint2);
+
+            } while (!response2.IsSuccessStatusCode);
+
+            var posts = await GetPostsAsync(apiEndpoint);
+
+            var jsonOptions = new JsonSerializerOptions();
+            jsonOptions.Converters.Add(new MovieConverter());
+
+            var response = await httpClient.GetFromJsonAsync<Movie>(apiEndpoint2, jsonOptions);
+
+            var json = await httpClient.GetStringAsync(apiEndpoint3);
+
+            var trailerLink = FindTrailerKey(json);
+
+            response.Trailer = "https://www.youtube.com/watch?v=" + trailerLink;
+            response.PosterPath = "https://image.tmdb.org/t/p/w200" + response.PosterPath;
+
+            _dbContext.Database.ExecuteSqlRaw("DELETE FROM movies WHERE movie_id < 1000");
+            _dbContext.Movies.AddRange(response);
+            await _dbContext.SaveChangesAsync();
+
+            var movies = ((OkObjectResult)GetAllMovies()).Value as List<Movie>;
+
+            var viewModel = new PostMovieViewModel
+            {
+                Posts = posts,
+                Movies = movies
+            };
+
+            if (posts != null && posts.Count > 0) return View(viewModel);
 
             return View();
         }

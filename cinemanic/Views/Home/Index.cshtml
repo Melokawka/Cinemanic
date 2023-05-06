@@ -7,10 +7,18 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 
-@model List<Post>
+@model PostMovieViewModel
 
-@foreach (var post in Model)
+@foreach (var post in Model.Posts)
 {
     <h2>@Html.Raw(post.Title.Rendered)</h2>
     <p>@Html.Raw(post.Content.Rendered)</p>
+}
+
+@foreach (var movie in Model.Movies)
+{
+    <h2>@movie.Title</h2>
+    <img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath">
+    <p>@movie.Description</p>
+    <p>Release Date: @movie.ReleaseDate.Value.ToShortDateString()</p>
 }

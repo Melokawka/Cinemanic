@@ -1,3 +1,7 @@
+using cinemanic.Data;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
+
 namespace cinemanic
 {
     public class Program
@@ -20,6 +24,8 @@ namespace cinemanic
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddDbContext<CinemanicDbContext>();
 
             var app = builder.Build();
 
