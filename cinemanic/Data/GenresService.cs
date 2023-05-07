@@ -40,7 +40,7 @@ namespace cinemanic.Data
             {
                 await dbContext.Database.ExecuteSqlRawAsync("SET IDENTITY_INSERT Genres ON");
 
-                //await dbContext.Genres.AddRangeAsync(genreList);
+                await dbContext.Genres.AddRangeAsync(genreList);
 
                 await dbContext.SaveChangesAsync();
 

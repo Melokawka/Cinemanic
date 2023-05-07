@@ -15,10 +15,23 @@
     <p>@Html.Raw(post.Content.Rendered)</p>
 }
 
-@foreach (var movie in Model.Movies)
+@foreach (var movie in Model.MoviesInfo)
 {
     <h2>@movie.Title</h2>
     <img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath">
     <p>@movie.Description</p>
     <p>Release Date: @movie.ReleaseDate.Value.ToShortDateString()</p>
+    <p>Duration: @movie.Duration minutes</p>
+    <p>Polish Made: @movie.PolishMade</p>
+    <p>Adult: @movie.Adult</p>
+    <p>Genres: @string.Join(", ", movie.Genres)</p>
+    @if (!string.IsNullOrEmpty(movie.Trailer))
+    {
+        <div>
+            <p>Trailer:</p>
+            <div>
+                <iframe width="560" height="315" src="@("http://www.youtube.com/embed/" + movie.Trailer)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            </div>
+        </div>
+    }
 }

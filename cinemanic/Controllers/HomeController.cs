@@ -9,6 +9,7 @@ using System.Text.Json;
 using Newtonsoft.Json.Linq;
 using static Bogus.DataSets.Name;
 using System.Security.Cryptography.Xml;
+using AutoMapper;
 
 namespace cinemanic.Controllers
 {
@@ -50,93 +51,34 @@ namespace cinemanic.Controllers
             }
         }
 
-        public static string FindTrailerKey(string json)
-        {
-            var jObject = JObject.Parse(json);
-            var jArray = (JArray)jObject["results"];
-
-            foreach (var item in jArray)
-            {
-                var type = (string)item["type"];
-                if (type == "Trailer")
-                {
-                    return (string)item["key"];
-                }
-            }
-
-            return null;
-        }
-
         public async Task<IActionResult> Index()
         {
             string apiEndpoint = "http://127.0.0.1:8080/wordpress/wp-json/wp/v2/posts";
 
-            Random random = new Random();
-            int movieId;
-            string apiEndpoint2;
-            string apiEndpoint3;
-            string apiEndpoint4;
-            HttpResponseMessage response2;
-            
-            var httpClient = new HttpClient();
-
-            do
-            {
-                movieId = random.Next(10000, 100001);
-                Console.WriteLine(movieId);
-                apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
-                apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
-                apiEndpoint4 = $"https://api.themoviedb.org/3/genre/movie/list?api_key=4446cb535a867cc6db4c689c8ebc7d97";
-
-
-                response2 = await httpClient.GetAsync(apiEndpoint2);
-
-            } while (!response2.IsSuccessStatusCode);
-
             var posts = await GetPostsAsync(apiEndpoint);
 
-            var jsonOptions = new JsonSerializerOptions();
-            jsonOptions.Converters.Add(new MovieConverter());
-
-            var response = await httpClient.GetFromJsonAsync<Movie>(apiEndpoint2, jsonOptions);
-
-            var json = await httpClient.GetStringAsync(apiEndpoint3);
-
-            var trailerLink = FindTrailerKey(json);
-
-            response.Trailer = "https://www.youtube.com/watch?v=" + trailerLink;
-            response.PosterPath = "https://image.tmdb.org/t/p/w200" + response.PosterPath;
-
-            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-            try
-            {
-                //_dbContext.Database.ExecuteSqlRaw("DELETE FROM movies WHERE id < 1000");
-
-                _dbContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Genres ON");
-                 //Create transfer object and add to transfer table
-                foreach (Genre genre in response.Genres)
-                {
-                    //var movieGenre = new MovieGenre { Movie = response, Genre = genre };
-                    //_dbContext.MovieGenre.Add(movieGenre);
-                }
-                
-                _dbContext.Movies.Add(response);
-
-                await _dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception)
-            {
-                await transaction.RollbackAsync();
-                throw;
-            }
-
             var movies = ((OkObjectResult)GetAllMovies()).Value as List<Movie>;
+
+            _dbContext.Movies.Include(m => m.Genres).ToList();
+
+            List<MovieInfo> MoviesInfo = new();
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Movie, MovieInfo>()
+                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()));
+
+                cfg.CreateMap<Genre, string>().ConvertUsing(g => g.GenreName);
+            });
+
+            IMapper mapper = config.CreateMapper();
+
+            foreach (Movie movie in movies) MoviesInfo.Add(mapper.Map<MovieInfo>(movie));
 
             var viewModel = new PostMovieViewModel
             {
                 Posts = posts,
-                Movies = movies
+                MoviesInfo = MoviesInfo
             };
 
             if (posts != null && posts.Count > 0) return View(viewModel);

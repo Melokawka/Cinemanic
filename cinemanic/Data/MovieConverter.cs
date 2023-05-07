@@ -31,7 +31,9 @@ namespace cinemanic.Data
                         movie.Title = reader.GetString();
                         break;
                     case "release_date":
-                        movie.ReleaseDate = DateTime.Parse(reader.GetString());
+                        string releaseDateString = reader.GetString();
+                        if (string.IsNullOrEmpty(releaseDateString)) movie.ReleaseDate = new DateTime(1939, 9, 1);
+                        else movie.ReleaseDate = DateTime.Parse(releaseDateString);
                         break;
                     case "runtime":
                         movie.Duration = reader.GetInt32();

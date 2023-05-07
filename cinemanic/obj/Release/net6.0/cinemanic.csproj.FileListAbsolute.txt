@@ -296,3 +296,4 @@ E:\Kino\cinemanic\bin\Release\net6.0\System.CodeDom.dll
 E:\Kino\cinemanic\bin\Release\net6.0\System.Text.Encodings.Web.dll
 E:\Kino\cinemanic\bin\Release\net6.0\System.Text.Json.dll
 E:\Kino\cinemanic\bin\Release\net6.0\runtimes\browser\lib\net6.0\System.Text.Encodings.Web.dll
+E:\Kino\cinemanic\bin\Release\net6.0\AutoMapper.dll

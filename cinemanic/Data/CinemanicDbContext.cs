@@ -1,6 +1,7 @@
 ﻿using cinemanic.Models;
 using cinemanic.Seeders;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Reflection.Metadata;
 
 namespace cinemanic.Data
@@ -15,7 +16,7 @@ namespace cinemanic.Data
         public DbSet<Screening> Screenings { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Genre> Genres { get; set; }
-        //public DbSet<MovieGenre> MovieGenre { get; set; }
+        public DbSet<MovieGenre> MovieGenre { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -23,6 +24,7 @@ namespace cinemanic.Data
             {
                 // Configure the database connection
                 optionsBuilder.UseSqlServer("Server=localhost\\CINEMANIC;Database=CINEMANIC2;Trusted_Connection=True;TrustServerCertificate=true;");
+                //optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         }
 
@@ -50,53 +52,7 @@ namespace cinemanic.Data
             modelBuilder.Entity<Movie>()
                 .HasMany(m => m.Likes)
                 .WithOne(l => l.Movie)
-                .HasForeignKey(l => l.MovieId);
-
-            modelBuilder.Entity<Account>()
-                .HasMany(a => a.Likes)
-                .WithOne(l => l.Account)
-                .HasForeignKey(l => l.UserEmail);
-
-            modelBuilder.Entity<Ticket>()
-                .HasOne(t => t.Screening)
-                .WithMany(s => s.Tickets)
-                .HasForeignKey(t => t.ScreeningId);
-
-            modelBuilder.Entity<Ticket>()
-                .HasMany(t => t.OrderTickets)
-                .WithOne(ot => ot.Ticket)
-                .HasForeignKey(ot => ot.TicketId);
-
-            modelBuilder.Entity<OrderTicket>()
-                .HasKey(ot => new { ot.OrderId, ot.TicketId });
-
-            modelBuilder.Entity<Order>()
-                .HasMany(o => o.OrderTickets)
-                .WithOne(ot => ot.Order)
-                .HasForeignKey(ot => ot.OrderId);
-
-            modelBuilder.Entity<NewsletterClient>()
-                .HasKey(nc => nc.UserEmail);
-
-            modelBuilder.Entity<Account>()
-                .HasMany(a => a.Orders)
-                .WithOne(o => o.Account)
-                .HasForeignKey(o => o.UserEmail);
-
-            modelBuilder.Entity<Screening>()
-                .HasOne(s => s.Movie)
-                .WithMany(m => m.Screenings)
-                .HasForeignKey(s => s.MovieId);
-
-            modelBuilder.Entity<Screening>()
-                .HasOne(s => s.Room)
-                .WithMany(r => r.Screenings)
-                .HasForeignKey(s => s.RoomId);
-
-            modelBuilder.Entity<Like>()
-                .HasKey(l => new { l.MovieId, l.UserEmail });*/
-
-
+                .HasForeignKey(l => l.MovieId);*/
         }
 
      }
