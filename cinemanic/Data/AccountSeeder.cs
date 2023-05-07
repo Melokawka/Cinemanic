@@ -1,34 +1,40 @@
-﻿using cinemanic.Models;
+﻿using Bogus;
+using cinemanic.Controllers;
+using cinemanic.Data;
+using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using System.Security.Cryptography;
 
 namespace cinemanic.Seeders
 {
     public static class AccountSeeder
     {
-        public static void SeedAccounts(DbContext dbContext, int numberOfAccounts)
+        public static Account SeedAccount(CinemanicDbContext dbContext)
         {
             var random = new Random();
 
-            for (int i = 0; i < numberOfAccounts; i++)
+            var account = new Account
             {
-                var account = new Account
-                {
-                    UserEmail = GenerateRandomEmail(),
-                    Birthdate = GenerateRandomBirthdate(),
-                    Password = GenerateRandomPassword()
-                };
+                UserEmail = GenerateRandomEmail(),
+                Birthdate = GenerateRandomBirthdate(),
+                Password = GenerateRandomPassword()
+            };
 
-                dbContext.Set<Account>().Add(account);
-            }
+
+            dbContext.Accounts.AddRange(account);
 
             dbContext.SaveChanges();
+
+            return account;
         }
 
         private static string GenerateRandomEmail()
         {
             // Logic to generate a random email address
-            // Example implementation:
-            return Guid.NewGuid().ToString() + "@example.com";
+            var faker = new Faker("pl");
+            return faker.Internet.Email();
         }
 
         private static DateTime GenerateRandomBirthdate()
@@ -46,7 +52,12 @@ namespace cinemanic.Seeders
         {
             // Logic to generate a random password
             // Example implementation:
-            return Guid.NewGuid().ToString().Substring(0, 8);
+            //return Guid.NewGuid().ToString().Substring(0, 8);
+            using (var algorithm = SHA256.Create())
+            {
+                var hashedBytes = algorithm.ComputeHash(Encoding.UTF8.GetBytes("1234"));
+                return BitConverter.ToString(hashedBytes).Replace("-", "");
+            }
         }
     }
 }

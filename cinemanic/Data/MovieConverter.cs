@@ -9,6 +9,7 @@ namespace cinemanic.Data
         public override Movie Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var movie = new Movie();
+
             while (reader.Read())
             {
                 if (reader.TokenType == JsonTokenType.EndObject)
@@ -52,6 +53,32 @@ namespace cinemanic.Data
                         break;
                     case "adult":
                         movie.Adult = reader.GetBoolean();
+                        break;
+                    case "genres":
+                        var genres = new List<Genre>();
+                        while (reader.Read() && reader.TokenType != JsonTokenType.EndArray)
+                        {
+                            var genre = new Genre();
+                            while (reader.Read() && reader.TokenType != JsonTokenType.EndObject)
+                            {
+                                propertyName = reader.GetString();
+                                reader.Read();
+                                switch (propertyName)
+                                {
+                                    case "id":
+                                        genre.Id = reader.GetInt32();
+                                        break;
+                                    case "name":
+                                        genre.GenreName = reader.GetString();
+                                        break;
+                                    default:
+                                        reader.Skip();
+                                        break;
+                                }
+                            }
+                            genres.Add(genre);
+                        }
+                        movie.Genres = genres;
                         break;
                     default:
                         reader.Skip();

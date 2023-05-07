@@ -7,6 +7,8 @@ using cinemanic.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 using Newtonsoft.Json.Linq;
+using static Bogus.DataSets.Name;
+using System.Security.Cryptography.Xml;
 
 namespace cinemanic.Controllers
 {
@@ -73,10 +75,8 @@ namespace cinemanic.Controllers
             int movieId;
             string apiEndpoint2;
             string apiEndpoint3;
+            string apiEndpoint4;
             HttpResponseMessage response2;
-
-            //string apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
-            //string apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
             
             var httpClient = new HttpClient();
 
@@ -86,6 +86,8 @@ namespace cinemanic.Controllers
                 Console.WriteLine(movieId);
                 apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
                 apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
+                apiEndpoint4 = $"https://api.themoviedb.org/3/genre/movie/list?api_key=4446cb535a867cc6db4c689c8ebc7d97";
+
 
                 response2 = await httpClient.GetAsync(apiEndpoint2);
 
@@ -105,9 +107,29 @@ namespace cinemanic.Controllers
             response.Trailer = "https://www.youtube.com/watch?v=" + trailerLink;
             response.PosterPath = "https://image.tmdb.org/t/p/w200" + response.PosterPath;
 
-            _dbContext.Database.ExecuteSqlRaw("DELETE FROM movies WHERE movie_id < 1000");
-            _dbContext.Movies.AddRange(response);
-            await _dbContext.SaveChangesAsync();
+            await using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                //_dbContext.Database.ExecuteSqlRaw("DELETE FROM movies WHERE id < 1000");
+
+                _dbContext.Database.ExecuteSqlRaw("SET IDENTITY_INSERT Genres ON");
+                 //Create transfer object and add to transfer table
+                foreach (Genre genre in response.Genres)
+                {
+                    //var movieGenre = new MovieGenre { Movie = response, Genre = genre };
+                    //_dbContext.MovieGenre.Add(movieGenre);
+                }
+                
+                _dbContext.Movies.Add(response);
+
+                await _dbContext.SaveChangesAsync();
+                await transaction.CommitAsync();
+            }
+            catch (Exception)
+            {
+                await transaction.RollbackAsync();
+                throw;
+            }
 
             var movies = ((OkObjectResult)GetAllMovies()).Value as List<Movie>;
 

@@ -2,9 +2,10 @@
 {
     public class Order
     {
-        public int OrderId { get; set; }
+        public int Id { get; set; }
         public decimal TotalPrice { get; set; }
-        public string UserEmail { get; set; }
-        public Account Account { get; set; }
+        public int AccountId { get; set; }
+        public Account Account { get; set; } = null!;
+        public List<Ticket> Tickets { get; } = new();
     }
 }

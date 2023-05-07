@@ -2,9 +2,10 @@
 {
     public class Like
     {
+        public int Id { get; set; }
         public int MovieId { get; set; }
-        public string UserEmail { get; set; }
-        public Movie Movie { get; set; }
-        public Account Account { get; set; }
+        public int AccountId { get; set; }
+        public Movie Movie { get; set; } = null!;
+        public Account Account { get; set; } = null!;
     }
 }

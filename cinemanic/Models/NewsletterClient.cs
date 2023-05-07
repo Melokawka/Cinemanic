@@ -1,8 +1,13 @@
-﻿namespace cinemanic.Models
-{
+﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+
+namespace cinemanic.Models
+{        
     public class NewsletterClient
     {
-        public string UserEmail { get; set; }
-        public Account Account { get; set; }
+        [Key]
+        public int AccountId { get; set; }
+        public Account Account { get; set; } = null!;
     }
 }
