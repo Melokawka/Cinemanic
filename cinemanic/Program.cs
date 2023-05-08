@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
+using System.Globalization;
 using System.Net;
 using System.Reflection.Metadata;
 
@@ -16,19 +17,17 @@ namespace cinemanic
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add CORS policy
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowWordPressApi",
                     policyBuilder =>
                     {
-                        policyBuilder.WithOrigins("http://127.0.0.1:8080") // Replace PORT with your WordPress server port number
+                        policyBuilder.WithOrigins("http://127.0.0.1:8080") 
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
             });
 
-            // Add services to the container.
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<CinemanicDbContext>();
@@ -45,7 +44,6 @@ namespace cinemanic
 
             app.UseRouting();
 
-            // Enable CORS for the specified policy
             app.UseCors("AllowWordPressApi");            
             
             app.UseAuthorization();
@@ -57,9 +55,7 @@ namespace cinemanic
             app.MapControllerRoute(
             name: "login",
             pattern: "login",
-            defaults: new { controller = "Accounts", action = "Login" }
-            );
-
+            defaults: new { controller = "Accounts", action = "Login" });
 
             using (var scope = app.Services.CreateScope())
             {
@@ -74,7 +70,13 @@ namespace cinemanic
 
                 await MoviesService.GetMovies(dbContext);
 
-                AccountSeeder.SeedAccount(dbContext);
+                AccountSeeder.SeedAccounts(dbContext);
+                RoomSeeder.SeedRooms(dbContext);
+                await LikeSeeder.SeedLikes(dbContext);
+                await NewsletterClientSeeder.SeedNewsletterClients(dbContext);
+                await ScreeningSeeder.SeedScreenings(dbContext);
+                await OrderSeeder.SeedOrders(dbContext);
+                await TicketSeeder.SeedTickets(dbContext);
             }
 
             app.Run();

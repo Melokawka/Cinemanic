@@ -11,7 +11,6 @@ namespace cinemanic.Models
         public string Password { get; set; }
         public NewsletterClient NewsletterClient { get; set; } = null!;
         public List<Like> Likes { get; } = new();
-        public List<Ticket> Tickets { get; } = new();
         public List<Order> Orders { get; } = new();
     }
 }

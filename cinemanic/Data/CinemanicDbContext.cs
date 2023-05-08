@@ -16,7 +16,8 @@ namespace cinemanic.Data
         public DbSet<Screening> Screenings { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Genre> Genres { get; set; }
-        public DbSet<MovieGenre> MovieGenre { get; set; }
+        public DbSet<Like> Likes { get; set; }
+        //public DbSet<MovieGenre> MovieGenre { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

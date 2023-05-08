@@ -11,23 +11,23 @@ namespace cinemanic.Seeders
 {
     public static class AccountSeeder
     {
-        public static Account SeedAccount(CinemanicDbContext dbContext)
+        public static void SeedAccounts(CinemanicDbContext dbContext)
         {
             var random = new Random();
 
-            var account = new Account
+            for (int i = 0; i < random.Next(4, 5); i++)
             {
-                UserEmail = GenerateRandomEmail(),
-                Birthdate = GenerateRandomBirthdate(),
-                Password = GenerateRandomPassword()
-            };
+                var account = new Account
+                {
+                    UserEmail = GenerateRandomEmail(),
+                    Birthdate = GenerateRandomBirthdate(),
+                    Password = GenerateRandomPassword()
+                };
 
-
-            dbContext.Accounts.AddRange(account);
+                dbContext.Accounts.AddRange(account);
+            }
 
             dbContext.SaveChanges();
-
-            return account;
         }
 
         private static string GenerateRandomEmail()
