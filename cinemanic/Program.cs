@@ -1,13 +1,8 @@
 using cinemanic.Data;
+using cinemanic.Models;
 using cinemanic.Seeders;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using System.Globalization;
-using System.Net;
-using System.Reflection.Metadata;
+using Microsoft.AspNetCore.Identity;
 
 namespace cinemanic
 {
@@ -22,7 +17,7 @@ namespace cinemanic
                 options.AddPolicy("AllowWordPressApi",
                     policyBuilder =>
                     {
-                        policyBuilder.WithOrigins("http://127.0.0.1:8080") 
+                        policyBuilder.WithOrigins("http://127.0.0.1:8080")
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });
@@ -32,9 +27,48 @@ namespace cinemanic
 
             builder.Services.AddDbContext<CinemanicDbContext>();
 
+            builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
+                .AddEntityFrameworkStores<CinemanicDbContext>()
+                .AddDefaultTokenProviders();
+
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            })
+            .AddCookie(options =>
+            {
+                options.Cookie.Name = "_auth";
+
+                options.LoginPath = "/logowanie";
+                options.LogoutPath = "/wyloguj";
+
+                options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+                options.Cookie.SameSite = SameSiteMode.None;
+
+                options.Cookie.HttpOnly = true;
+            });
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/logowanie";
+            });
+
+            builder.Services.Configure<IdentityOptions>(options =>
+            {
+                options.Password.RequiredLength = 4;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireUppercase = false;
+            });
+
+            builder.Services.AddLogging(logging =>
+            {
+                logging.ClearProviders();
+                logging.AddConsole();
+            });
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -44,8 +78,10 @@ namespace cinemanic
 
             app.UseRouting();
 
-            app.UseCors("AllowWordPressApi");            
-            
+            app.UseCors("AllowWordPressApi");
+
+            // apparently the order is important...
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
@@ -70,14 +106,33 @@ namespace cinemanic
 
                 await MoviesService.GetMovies(dbContext);
 
-                AccountSeeder.SeedAccounts(dbContext);
+                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+                var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+
+                var adminRole = new ApplicationRole(ApplicationRole.Admin);
+                await roleManager.CreateAsync(adminRole);
+
+                var userRole = new ApplicationRole(ApplicationRole.User);
+                await roleManager.CreateAsync(userRole);
+
+                await AccountSeeder.SeedAccounts(userManager, dbContext);
                 RoomSeeder.SeedRooms(dbContext);
                 await LikeSeeder.SeedLikes(dbContext);
                 await NewsletterClientSeeder.SeedNewsletterClients(dbContext);
                 await ScreeningSeeder.SeedScreenings(dbContext);
                 await OrderSeeder.SeedOrders(dbContext);
                 await TicketSeeder.SeedTickets(dbContext);
+                await IdentityDataInitializer.SeedData(userManager, roleManager);
             }
+
+            //app.Use(async (context, next) =>
+            //{
+            //    var logger = context.RequestServices.GetService<ILogger<Program>>();
+            //    logger.LogInformation("Before authentication middleware");
+            //    await next();
+            //    logger.LogInformation("After authentication middleware");
+            //});
 
             app.Run();
         }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using cinemanic.Data;
+using cinemanic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using cinemanic.Data;
-using cinemanic.Models;
 
 namespace cinemanic.Controllers
 {
@@ -20,16 +17,16 @@ namespace cinemanic.Controllers
             _context = context;
         }
 
-        // GET: Orders
         [HttpGet("")]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var cinemanicDbContext = _context.Orders.Include(o => o.Account);
             return View(await cinemanicDbContext.ToListAsync());
         }
 
-        // GET: Orders/Details/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -48,18 +45,18 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
-        // GET: Orders/Create
         [HttpGet("create")]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["AccountId"] = new SelectList(_context.Accounts, "Id", "Id");
             return View();
         }
 
-        // POST: Orders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("create")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TotalPrice,AccountId")] Order order)
         {
@@ -73,8 +70,8 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
-        // GET: Orders/Edit/5
         [HttpGet("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -91,10 +88,10 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
-        // POST: Orders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,TotalPrice,AccountId")] Order order)
         {
@@ -127,8 +124,8 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
-        // GET: Orders/Delete/5
         [HttpGet("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -147,8 +144,8 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
-        // POST: Orders/Delete/5
         [HttpPost("delete/{id}"), ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -161,14 +158,14 @@ namespace cinemanic.Controllers
             {
                 _context.Orders.Remove(order);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool OrderExists(int id)
         {
-          return (_context.Orders?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Orders?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

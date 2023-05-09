@@ -1,33 +1,59 @@
 ﻿using Bogus;
-using cinemanic.Controllers;
 using cinemanic.Data;
 using cinemanic.Models;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using System.Security.Cryptography;
+using Microsoft.AspNetCore.Identity;
 
 namespace cinemanic.Seeders
 {
     public static class AccountSeeder
     {
-        public static void SeedAccounts(CinemanicDbContext dbContext)
+        public static async Task SeedAccounts(UserManager<ApplicationUser> userManager, CinemanicDbContext dbContext)
         {
-            var random = new Random();
-
-            for (int i = 0; i < random.Next(4, 5); i++)
+            // Create an admin user
+            var adminEmail = "admin@example.com";
+            var adminPassword = "1234";
+            if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
-                var account = new Account
+                var adminUser = new ApplicationUser { Email = adminEmail, UserName = adminEmail };
+                var result = await userManager.CreateAsync(adminUser, adminPassword);
+                if (result.Succeeded)
                 {
-                    UserEmail = GenerateRandomEmail(),
-                    Birthdate = GenerateRandomBirthdate(),
-                    Password = GenerateRandomPassword()
-                };
-
-                dbContext.Accounts.AddRange(account);
+                    await userManager.AddToRoleAsync(adminUser, ApplicationRole.Admin);
+                }
             }
 
-            dbContext.SaveChanges();
+            // Create a regular user
+            for (int i = 0; i < 5; i++)
+            {
+                var userEmail = "user" + i + "@example.com";
+                var userPassword = "1234";
+                if (await userManager.FindByEmailAsync(userEmail) == null)
+                {
+                    var user = new ApplicationUser { Email = userEmail, UserName = userEmail, BirthDate = GenerateRandomBirthdate() };
+                    var result = await userManager.CreateAsync(user, userPassword);
+                    Console.WriteLine(user.Email.ToString());
+                    Console.WriteLine(user.UserName.ToString());
+                    Console.WriteLine(user.BirthDate.ToString());
+                    Console.WriteLine(result.Succeeded);
+
+                    if (result.Succeeded)
+                    {
+                        await userManager.AddToRoleAsync(user, ApplicationRole.User);
+                        Console.WriteLine(user.Id.ToString());
+                        Console.WriteLine(user.PasswordHash.ToString());
+
+                        var userAccount = new Account
+                        {
+                            UserEmail = user.Email,
+                            Birthdate = user.BirthDate,
+                        };
+                        dbContext.Accounts.Add(userAccount);
+
+                        Console.WriteLine(userAccount.ToString());
+                    }
+                }
+            }
+            await dbContext.SaveChangesAsync();
         }
 
         private static string GenerateRandomEmail()
@@ -40,24 +66,11 @@ namespace cinemanic.Seeders
         private static DateTime GenerateRandomBirthdate()
         {
             // Logic to generate a random birthdate within a desired range
-            // Example implementation:
             var random = new Random();
             var startDateTime = new DateTime(1950, 1, 1);
             var endDateTime = DateTime.Now.Date;
             int range = (endDateTime - startDateTime).Days;
             return startDateTime.AddDays(random.Next(range));
-        }
-
-        private static string GenerateRandomPassword()
-        {
-            // Logic to generate a random password
-            // Example implementation:
-            //return Guid.NewGuid().ToString().Substring(0, 8);
-            using (var algorithm = SHA256.Create())
-            {
-                var hashedBytes = algorithm.ComputeHash(Encoding.UTF8.GetBytes("1234"));
-                return BitConverter.ToString(hashedBytes).Replace("-", "");
-            }
         }
     }
 }

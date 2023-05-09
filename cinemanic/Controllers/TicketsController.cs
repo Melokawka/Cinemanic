@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using cinemanic.Data;
+using cinemanic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using cinemanic.Data;
-using cinemanic.Models;
 
 namespace cinemanic.Controllers
 {
@@ -20,16 +17,16 @@ namespace cinemanic.Controllers
             _context = context;
         }
 
-        // GET: Tickets
         [HttpGet("")]
+        [Authorize]
         public async Task<IActionResult> Index()
         {
             var cinemanicDbContext = _context.Tickets.Include(t => t.Order).Include(t => t.Screening);
             return View(await cinemanicDbContext.ToListAsync());
         }
 
-        // GET: Tickets/Details/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Tickets == null)
@@ -49,8 +46,8 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
-        // GET: Tickets/Create
         [HttpGet("create")]
+        [Authorize]
         public IActionResult Create()
         {
             var pricingTypes = Enum.GetValues(typeof(PricingType)).Cast<PricingType>();
@@ -61,10 +58,10 @@ namespace cinemanic.Controllers
             return View();
         }
 
-        // POST: Tickets/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("create")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId")] Ticket ticket)
         {
@@ -79,8 +76,8 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
-        // GET: Tickets/Edit/5
         [HttpGet("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Tickets == null)
@@ -102,10 +99,10 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
-        // POST: Tickets/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("edit/{id}")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId")] Ticket ticket)
         {
@@ -139,8 +136,8 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
-        // GET: Tickets/Delete/5
         [HttpGet("delete/{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Tickets == null)
@@ -160,8 +157,8 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
-        // POST: Tickets/Delete/5
         [HttpPost("delete/{id}"), ActionName("Delete")]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -174,14 +171,14 @@ namespace cinemanic.Controllers
             {
                 _context.Tickets.Remove(ticket);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TicketExists(int id)
         {
-          return (_context.Tickets?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Tickets?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

@@ -9,37 +9,109 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = cinemanic
 build_property.RootNamespace = cinemanic
-build_property.ProjectDir = E:\Kino\cinemanic\
+build_property.ProjectDir = E:\Kino2\cinemanic\
 build_property.RazorLangVersion = 6.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = E:\Kino\cinemanic
+build_property.MSBuildProjectDirectory = E:\Kino2\cinemanic
 build_property._RazorSourceGeneratorDebug = 
 
-[E:/Kino/cinemanic/Views/Home/Index.cshtml]
+[E:/Kino2/cinemanic/Pages/_ValidationScriptsPartial.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX1ZhbGlkYXRpb25TY3JpcHRzUGFydGlhbC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Accounts/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudHNcTG9naW4uY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Accounts/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWNjb3VudHNcUmVnaXN0ZXIuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Kino/cinemanic/Views/Home/Privacy.cshtml]
+[E:/Kino2/cinemanic/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Kino/cinemanic/Views/Shared/Error.cshtml]
+[E:/Kino2/cinemanic/Views/Orders/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJzXENyZWF0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Orders/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJzXERlbGV0ZS5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Orders/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJzXERldGFpbHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Orders/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJzXEVkaXQuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Orders/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcT3JkZXJzXEluZGV4LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Screenings/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NyZWVuaW5nc1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Screenings/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NyZWVuaW5nc1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Screenings/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NyZWVuaW5nc1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Screenings/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NyZWVuaW5nc1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Screenings/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2NyZWVuaW5nc1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Kino/cinemanic/Views/Shared/_ValidationScriptsPartial.cshtml]
+[E:/Kino2/cinemanic/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Kino/cinemanic/Views/_ViewImports.cshtml]
+[E:/Kino2/cinemanic/Views/Tickets/Create.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlja2V0c1xDcmVhdGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Tickets/Delete.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlja2V0c1xEZWxldGUuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Tickets/Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlja2V0c1xEZXRhaWxzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Tickets/Edit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlja2V0c1xFZGl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/Tickets/Index.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVGlja2V0c1xJbmRleC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[E:/Kino2/cinemanic/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Kino/cinemanic/Views/_ViewStart.cshtml]
+[E:/Kino2/cinemanic/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[E:/Kino/cinemanic/Views/Shared/_Layout.cshtml]
+[E:/Kino2/cinemanic/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-upsmqhn4qf

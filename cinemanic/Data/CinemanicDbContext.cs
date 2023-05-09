@@ -1,8 +1,6 @@
 ﻿using cinemanic.Models;
-using cinemanic.Seeders;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using System.Reflection.Metadata;
 
 namespace cinemanic.Data
 {
@@ -17,6 +15,9 @@ namespace cinemanic.Data
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<Genre> Genres { get; set; }
         public DbSet<Like> Likes { get; set; }
+        public DbSet<ApplicationRole> ApplicationRoles { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+
         //public DbSet<MovieGenre> MovieGenre { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -31,7 +32,28 @@ namespace cinemanic.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<IdentityUserRole<string>>().ToTable("AspNetUserRoles");
+            modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("AspNetUserClaims");
+            modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("AspNetUserLogins");
+            modelBuilder.Entity<IdentityRoleClaim<string>>().ToTable("AspNetRoleClaims");
 
+            modelBuilder.Entity<ApplicationUser>(entity => entity.ToTable(name: "AspNetUsers"));
+
+            modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
+            {
+                entity.HasKey(e => new { e.LoginProvider, e.ProviderKey });
+            });
+
+            modelBuilder.Entity<IdentityUserToken<string>>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.LoginProvider, e.Name });
+                entity.ToTable("AspNetUserTokens");
+            });
+
+            modelBuilder.Entity<IdentityUserRole<string>>(entity =>
+            {
+                entity.HasKey(e => new { e.UserId, e.RoleId });
+            });
             /*modelBuilder.Entity<Movie>()
             .HasMany(m => m.Genres)
             .WithMany(g => g.Movies)
@@ -56,5 +78,5 @@ namespace cinemanic.Data
                 .HasForeignKey(l => l.MovieId);*/
         }
 
-     }
+    }
 }

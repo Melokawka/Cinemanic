@@ -1,6 +1,6 @@
 ﻿@model LoginViewModel
 
-@using (Html.BeginForm("Login", "Login", FormMethod.Post))
+@using (Html.BeginForm("Login", "Accounts", FormMethod.Post))
 {
     <div class="form-group">
         @Html.LabelFor(m => m.Email)
@@ -9,6 +9,10 @@
     <div class="form-group">
         @Html.LabelFor(m => m.Password)
         @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+    </div>
+    <div class="form-group form-check">
+        @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
+        @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
     </div>
     <button type="submit" class="btn btn-primary">Log in</button>
 }

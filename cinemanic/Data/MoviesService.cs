@@ -1,12 +1,6 @@
 ﻿using cinemanic.Models;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
-using System.Net.Http;
-using System;
 using System.Text.Json;
-using System.Net.NetworkInformation;
-using Azure;
-using static Bogus.DataSets.Name;
 
 namespace cinemanic.Data
 {
@@ -82,7 +76,8 @@ namespace cinemanic.Data
             jsonOptions.Converters.Add(new MovieConverter());
 
             //retrieve 10 random movies from tmdb api
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 1; i++)
+            {
                 await GetRandomId();
                 movies.Add(await GetMovie(dbContext));
             }

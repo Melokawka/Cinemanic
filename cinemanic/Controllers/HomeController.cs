@@ -1,19 +1,17 @@
-﻿using cinemanic.Models;
-using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Cors;
+﻿using AutoMapper;
 using cinemanic.Data;
+using cinemanic.Models;
+using Microsoft.AspNetCore.Cors;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
-using Newtonsoft.Json.Linq;
-using static Bogus.DataSets.Name;
-using System.Security.Cryptography.Xml;
-using AutoMapper;
+using Newtonsoft.Json;
+using System.Diagnostics;
 
 namespace cinemanic.Controllers
 {
+
     [EnableCors("AllowWordPressApi")]
+    [Route("")]
     public class HomeController : Controller
     {
         private readonly CinemanicDbContext _dbContext;
@@ -22,7 +20,6 @@ namespace cinemanic.Controllers
             _dbContext = dbContext;
         }
 
-        [HttpGet]
         public IActionResult GetAllMovies()
         {
             var movies = _dbContext.Movies.ToList();
@@ -45,12 +42,13 @@ namespace cinemanic.Controllers
                 }
                 else
                 {
-                    // handle error
                     return null;
                 }
             }
         }
 
+        [Route("")]
+        [HttpGet]
         public async Task<IActionResult> Index()
         {
             string apiEndpoint = "http://127.0.0.1:8080/wordpress/wp-json/wp/v2/posts";

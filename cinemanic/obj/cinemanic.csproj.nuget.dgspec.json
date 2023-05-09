@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "E:\\Kino\\cinemanic\\cinemanic.csproj": {}
+    "E:\\Kino2\\cinemanic\\cinemanic.csproj": {}
   },
   "projects": {
-    "E:\\Kino\\cinemanic\\cinemanic.csproj": {
+    "E:\\Kino2\\cinemanic\\cinemanic.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "E:\\Kino\\cinemanic\\cinemanic.csproj",
+        "projectUniqueName": "E:\\Kino2\\cinemanic\\cinemanic.csproj",
         "projectName": "cinemanic",
-        "projectPath": "E:\\Kino\\cinemanic\\cinemanic.csproj",
+        "projectPath": "E:\\Kino2\\cinemanic\\cinemanic.csproj",
         "packagesPath": "C:\\Users\\Jamistrz\\.nuget\\packages\\",
-        "outputPath": "E:\\Kino\\cinemanic\\obj\\",
+        "outputPath": "E:\\Kino2\\cinemanic\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "C:\\Users\\Jamistrz\\AppData\\Roaming\\NuGet\\NuGet.Config",
@@ -49,6 +49,10 @@
               "version": "[34.0.2, )"
             },
             "Microsoft.AspNetCore.Cors": {
+              "target": "Package",
+              "version": "[2.2.0, )"
+            },
+            "Microsoft.AspNetCore.Identity": {
               "target": "Package",
               "version": "[2.2.0, )"
             },
