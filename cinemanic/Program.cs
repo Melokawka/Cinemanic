@@ -26,6 +26,8 @@ namespace cinemanic
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<CinemanicDbContext>();
+            //builder.Services.AddDbContext<CinemanicDbContext>(options =>
+            //    options.UseSqlServer(builder.Configuration.GetConnectionString("CinemanicDb")));
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<CinemanicDbContext>()
@@ -93,6 +95,8 @@ namespace cinemanic
             pattern: "login",
             defaults: new { controller = "Accounts", action = "Login" });
 
+            await new WordPressMockPostCreator().UploadImageFromUrl();
+
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
@@ -125,14 +129,6 @@ namespace cinemanic
                 await TicketSeeder.SeedTickets(dbContext);
                 await IdentityDataInitializer.SeedData(userManager, roleManager);
             }
-
-            //app.Use(async (context, next) =>
-            //{
-            //    var logger = context.RequestServices.GetService<ILogger<Program>>();
-            //    logger.LogInformation("Before authentication middleware");
-            //    await next();
-            //    logger.LogInformation("After authentication middleware");
-            //});
 
             app.Run();
         }

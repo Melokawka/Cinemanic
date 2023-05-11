@@ -12,10 +12,52 @@
 
 @model PostMovieViewModel
 
+<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+        @{
+            int count = 0;
+            foreach (var movie in Model.MoviesInfo)
+            {
+                <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="@count" @(count == 0 ? "class=active" : "") aria-label="Slide @(count + 1)"></button>
+                count++;
+            }
+        }
+    </div>
+    <div class="carousel-inner">
+        @{
+            int count2 = 0;
+            foreach (var movie in Model.MoviesInfo)
+            {
+                <div class="carousel-item @(count2 == 0 ? "active" : "")">
+                    <img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath">
+                    <div class="carousel-caption d-none d-md-block">
+                        <h5>@movie.Title</h5>
+
+                    </div>
+                </div>
+                count2++;
+            }
+        }
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+    </button>
+</div>
+
 @foreach (var post in Model.Posts)
 {
     <h2>@Html.Raw(post.Title.Rendered)</h2>
+    @if (!string.IsNullOrEmpty(post.FeaturedMediaUrl))
+    {
+        <img src="@post.FeaturedMediaUrl" alt="@post.Title.Rendered" class="post-image" />
+    }
     <p>@Html.Raw(post.Content.Rendered)</p>
+
 }
 
 @foreach (var movie in Model.MoviesInfo)

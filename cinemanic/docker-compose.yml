@@ -1,0 +1,59 @@
+version: "3.9"  # optional since v1.27.0
+
+networks:
+  localdev:
+    name: localdev
+
+services:
+  cinemanic:
+    image: cinemanic
+    container_name: cinemanic
+    ports:
+      - "5274:80"
+    depends_on:
+      - sql
+    networks:
+      - localdev
+  sql:
+    image: "mcr.microsoft.com/mssql/server:2022-latest"
+    container_name: sql
+    ports:
+      - "1433:1433"
+    environment:
+      - ACCEPT_EULA=y
+      - SA_PASSWORD=A&VeryComplex123Password
+    networks:
+      - localdev
+    volumes:
+      - mssql-data:/var/opt/mssql
+  db:
+    image: mysql:8.0.27
+    networks:
+      - localdev
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_DATABASE=cinemaposts
+    ports:
+      - 3306:3306
+  wordpress:
+    image: wordpress:latest
+    networks:
+      - localdev
+    volumes:
+      - wp_data:/var/www/html
+    ports:
+      - 8080:80
+    restart: always
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER=root
+      - WORDPRESS_DB_PASSWORD=admin
+      - WORDPRESS_DB_NAME=cinemaposts
+volumes:
+  db_data:
+  wp_data:
+  mssql-data:  

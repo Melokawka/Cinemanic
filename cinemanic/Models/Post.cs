@@ -4,8 +4,13 @@ namespace cinemanic.Models
 {
     public class Post
     {
+        [JsonProperty("id")]
+        public int Id { get; set; }
         public RenderedProperty Title { get; set; }
         public RenderedProperty Content { get; set; }
+
+        [JsonProperty("featured_media")]
+        public string? FeaturedMediaUrl { get; set; }
     }
 
     public class RenderedProperty

@@ -76,7 +76,7 @@ namespace cinemanic.Data
             jsonOptions.Converters.Add(new MovieConverter());
 
             //retrieve 10 random movies from tmdb api
-            for (int i = 0; i < 1; i++)
+            for (int i = 0; i < 5; i++)
             {
                 await GetRandomId();
                 movies.Add(await GetMovie(dbContext));

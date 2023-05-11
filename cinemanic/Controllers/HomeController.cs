@@ -1,16 +1,17 @@
 ﻿using AutoMapper;
 using cinemanic.Data;
 using cinemanic.Models;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System.Diagnostics;
+using System.Net.Http.Headers;
 
 namespace cinemanic.Controllers
 {
 
-    [EnableCors("AllowWordPressApi")]
+    //[EnableCors("AllowWordPressApi")]
     [Route("")]
     public class HomeController : Controller
     {
@@ -31,19 +32,33 @@ namespace cinemanic.Controllers
         {
             using (HttpClient client = new())
             {
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJtZWxva2F3a2EiLCJpYXQiOjE2ODM3NjA5NjAsImV4cCI6MTg0MTQ0MDk2MH0.oTb_MWYE1VgPuC3-zcg2eDXedj8Xqel2hmiexvj0_Wg");
                 HttpResponseMessage response = await client.GetAsync(apiEndpoint);
 
-                if (response.IsSuccessStatusCode)
-                {
-                    string jsonResponse = await response.Content.ReadAsStringAsync();
+                string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                    var posts = JsonConvert.DeserializeObject<List<Post>>(jsonResponse);
-                    return posts;
-                }
-                else
+                var posts = JsonConvert.DeserializeObject<List<Post>>(jsonResponse);
+
+                foreach (var post in posts)
                 {
-                    return null;
+                    int id = post.Id;
+                    var apiPath = "http://localhost:8080/wp-json/wp/v2/posts/" + id + "?_embed";
+
+                    HttpResponseMessage mediaResponse = await client.GetAsync(apiPath);
+
+                    string mediaJsonResponse = await mediaResponse.Content.ReadAsStringAsync();
+
+                    JObject mediaJsonObject = JObject.Parse(mediaJsonResponse);
+
+                    JToken featuredMedia = mediaJsonObject["_embedded"]["wp:featuredmedia"].FirstOrDefault();
+                    if (featuredMedia != null)
+                    {
+                        string mediaUrl = featuredMedia["source_url"].ToString();
+                        post.FeaturedMediaUrl = mediaUrl;
+                    }
                 }
+
+                return posts;
             }
         }
 
@@ -51,7 +66,7 @@ namespace cinemanic.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            string apiEndpoint = "http://127.0.0.1:8080/wordpress/wp-json/wp/v2/posts";
+            string apiEndpoint = "http://127.0.0.1:8080/wp-json/wp/v2/posts?per_page=3";
 
             var posts = await GetPostsAsync(apiEndpoint);
 
@@ -73,15 +88,17 @@ namespace cinemanic.Controllers
 
             foreach (Movie movie in movies) MoviesInfo.Add(mapper.Map<MovieInfo>(movie));
 
+            //foreach (MovieInfo info in MoviesInfo) foreach (var property in typeof(MovieInfo).GetProperties()) Console.WriteLine(property.Name + " = " + property.GetValue(info));
+
+            //foreach (Post post in posts) foreach (var property in typeof(Post).GetProperties()) Console.WriteLine(property.Name + " = " + property.GetValue(post));
+
             var viewModel = new PostMovieViewModel
             {
                 Posts = posts,
                 MoviesInfo = MoviesInfo
             };
 
-            if (posts != null && posts.Count > 0) return View(viewModel);
-
-            return View();
+            return View(viewModel);
         }
 
         public IActionResult Privacy()

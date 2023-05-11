@@ -1,0 +1,23 @@
+﻿body {
+}
+
+#myCarousel {
+    width: 80%;
+    margin: auto;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+}
+
+.carousel-caption {
+    bottom: 50%;
+    transform: translateY(50%);
+}
+
+.post-image {
+    width: 100px;
+    height: 100px;
+}

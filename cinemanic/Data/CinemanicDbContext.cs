@@ -24,8 +24,10 @@ namespace cinemanic.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
+
                 // Configure the database connection
-                optionsBuilder.UseSqlServer("Server=localhost\\CINEMANIC;Database=CINEMANIC2;Trusted_Connection=True;TrustServerCertificate=true;");
+                optionsBuilder.UseSqlServer("server=localhost;user id=sa;database=cinemanic;password=A&VeryComplex123Password;multipleactiveresultsets=true;trustservercertificate=true");
+                //optionsBuilder.EnableRetryOnFailure(10, TimeSpan.FromSeconds(5), new List<int> { 18456 });
                 //optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
             }
         }
