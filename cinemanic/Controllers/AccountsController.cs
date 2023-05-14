@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace cinemanic.Controllers
@@ -27,6 +28,65 @@ namespace cinemanic.Controllers
             return View();
         }
 
+        [Route("konto")]
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Account()
+        {
+            var user = await _userManager.GetUserAsync(User);
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            var birthDate = new DateTimeOffset(user.BirthDate);
+            var tickets = _dbContext.Tickets
+                .Include(at => at.Screening)
+                    .ThenInclude(s => s.Movie)
+                        .ThenInclude(m => m.Genres)
+                .Where(t => t.Order.Account.UserEmail == user.Email)
+                .OrderBy(t => t.Screening.ScreeningDate)
+                .ToList();
+
+            var archivedTickets = _dbContext.ArchivedTickets
+                .Include(at => at.Screening)
+                    .ThenInclude(s => s.Movie)
+                        .ThenInclude(m => m.Genres)
+                .Join(_dbContext.Orders, at => at.OrderId, o => o.Id, (at, o) => new { ArchivedTicket = at, Order = o })
+                .Where(j => j.Order.Account.UserEmail == user.Email)
+                .OrderBy(j => j.ArchivedTicket.Screening.ScreeningDate)
+                .Select(j => j.ArchivedTicket)
+                .ToList();
+
+            var likes = _dbContext.Likes
+                .Include(l => l.Movie)
+                    .ThenInclude(m => m.Genres)
+                .Include(l => l.Account)
+                .Where(l => l.Account.UserEmail == user.Email)
+                .ToList();
+
+            var orders = _dbContext.Orders
+                .Include(o => o.Account)
+                .Include(o => o.Tickets)
+                .Where(o => o.Account.UserEmail == user.Email)
+                .ToList();
+
+            foreach (Order info in orders) foreach (var property in typeof(Order).GetProperties()) Console.WriteLine(property.Name + " = " + property.GetValue(info));
+
+            var model = new AccountViewModel()
+            {
+                Email = user.Email,
+                BirthDate = birthDate,
+                Tickets = tickets,
+                ArchivedTickets = archivedTickets,
+                Likes = likes,
+                Orders = orders
+            };
+
+            return View(model);
+        }
+
         [AllowAnonymous]
         [Route("logowanie")]
         [HttpPost]
@@ -41,10 +101,16 @@ namespace cinemanic.Controllers
                 if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
                 {
                     // Create authentication cookie // below is default cause mine doesnt work CookieAuthenticationDefaults.AuthenticationScheme
-                    var identity = new ClaimsIdentity(IdentityConstants.ApplicationScheme);
-                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, "Id"));
-                    identity.AddClaim(new Claim(ClaimTypes.Name, "UserName"));
-                    identity.AddClaim(new Claim(ClaimTypes.Name, "Email"));
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.NameIdentifier, user.Id),
+                        new Claim(ClaimTypes.DateOfBirth, user.BirthDate.ToString("o")),
+                        new Claim(ClaimTypes.Email, user.Email)
+                    };
+
+                    var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
+                    //var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+
 
                     var principal = new ClaimsPrincipal(identity);
                     var authProperties = new AuthenticationProperties

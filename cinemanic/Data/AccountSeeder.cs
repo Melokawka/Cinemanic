@@ -14,7 +14,7 @@ namespace cinemanic.Seeders
             var adminPassword = "1234";
             if (await userManager.FindByEmailAsync(adminEmail) == null)
             {
-                var adminUser = new ApplicationUser { Email = adminEmail, UserName = adminEmail };
+                var adminUser = new ApplicationUser { Email = adminEmail, UserName = adminEmail, BirthDate = GenerateRandomBirthdate() };
                 var result = await userManager.CreateAsync(adminUser, adminPassword);
                 if (result.Succeeded)
                 {

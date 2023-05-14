@@ -29,6 +29,8 @@ namespace cinemanic
             //builder.Services.AddDbContext<CinemanicDbContext>(options =>
             //    options.UseSqlServer(builder.Configuration.GetConnectionString("CinemanicDb")));
 
+            builder.Services.AddHostedService<TicketArchiveHostedService>();
+
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<CinemanicDbContext>()
                 .AddDefaultTokenProviders();
@@ -36,6 +38,7 @@ namespace cinemanic
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+                //options.DefaultScheme = IdentityConstants.ApplicationScheme;
             })
             .AddCookie(options =>
             {
