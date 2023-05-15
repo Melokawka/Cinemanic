@@ -11,6 +11,7 @@ namespace cinemanic.Models
 
         [JsonProperty("featured_media")]
         public string? FeaturedMediaUrl { get; set; }
+        public string Link { get; set; }
     }
 
     public class RenderedProperty

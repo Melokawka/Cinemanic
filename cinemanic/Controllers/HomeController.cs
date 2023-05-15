@@ -28,21 +28,35 @@ namespace cinemanic.Controllers
             return Ok(movies);
         }
 
-        public async Task<List<Post>> GetPostsAsync(string apiEndpoint)
+        [HttpGet]
+        [Route("getpostsjson")]
+        public async Task<string> GetPostsJsonAsync(string apiEndpoint)
         {
             using (HttpClient client = new())
             {
                 client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJtZWxva2F3a2EiLCJpYXQiOjE2ODM3NjA5NjAsImV4cCI6MTg0MTQ0MDk2MH0.oTb_MWYE1VgPuC3-zcg2eDXedj8Xqel2hmiexvj0_Wg");
-                HttpResponseMessage response = await client.GetAsync(apiEndpoint);
+                HttpResponseMessage response = await client.GetAsync("http://127.0.0.1:8080/wp-json/wp/v2/posts?per_page=3");
 
                 string jsonResponse = await response.Content.ReadAsStringAsync();
 
-                var posts = JsonConvert.DeserializeObject<List<Post>>(jsonResponse);
+                return jsonResponse;
+            }
+        }
 
-                foreach (var post in posts)
+        public async Task<List<Post>> GetPostsAsync(string apiEndpoint)
+        {
+            string jsonResponse = await GetPostsJsonAsync(apiEndpoint);
+
+            var posts = JsonConvert.DeserializeObject<List<Post>>(jsonResponse);
+
+            foreach (var post in posts)
+            {
+                int id = post.Id;
+                var apiPath = "http://localhost:8080/wp-json/wp/v2/posts/" + id + "?_embed";
+
+                using (HttpClient client = new())
                 {
-                    int id = post.Id;
-                    var apiPath = "http://localhost:8080/wp-json/wp/v2/posts/" + id + "?_embed";
+                    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEsIm5hbWUiOiJtZWxva2F3a2EiLCJpYXQiOjE2ODM3NjA5NjAsImV4cCI6MTg0MTQ0MDk2MH0.oTb_MWYE1VgPuC3-zcg2eDXedj8Xqel2hmiexvj0_Wg");
 
                     HttpResponseMessage mediaResponse = await client.GetAsync(apiPath);
 
@@ -57,9 +71,8 @@ namespace cinemanic.Controllers
                         post.FeaturedMediaUrl = mediaUrl;
                     }
                 }
-
-                return posts;
             }
+            return posts;
         }
 
         [Route("")]
@@ -70,23 +83,27 @@ namespace cinemanic.Controllers
 
             var posts = await GetPostsAsync(apiEndpoint);
 
-            var movies = ((OkObjectResult)GetAllMovies()).Value as List<Movie>;
-
-            _dbContext.Movies.Include(m => m.Genres).ToList();
-
-            List<MovieInfo> MoviesInfo = new();
+            var movies = _dbContext.Movies
+                .Include(m => m.Genres)
+                .Include(m => m.Screenings)
+                .ToList();
 
             var config = new MapperConfiguration(cfg =>
             {
                 cfg.CreateMap<Movie, MovieInfo>()
-                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()));
+                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()))
+                    .ForMember(dest => dest.Screenings, opt => opt.MapFrom(src => src.Screenings.Select(s => s).ToList()));
 
                 cfg.CreateMap<Genre, string>().ConvertUsing(g => g.GenreName);
             });
 
             IMapper mapper = config.CreateMapper();
+            var MoviesInfo = mapper.Map<List<Movie>, List<MovieInfo>>(movies);
 
-            foreach (Movie movie in movies) MoviesInfo.Add(mapper.Map<MovieInfo>(movie));
+            foreach (var movie in MoviesInfo)
+            {
+                movie.Screenings = movie.Screenings.OrderBy(s => s.ScreeningDate).ToList();
+            }
 
             //foreach (MovieInfo info in MoviesInfo) foreach (var property in typeof(MovieInfo).GetProperties()) Console.WriteLine(property.Name + " = " + property.GetValue(info));
 

@@ -17,6 +17,10 @@
       "PackagePath": "staticwebassets\\favicon.ico"
     },
     {
+      "Id": "E:\\Kino2\\cinemanic\\wwwroot\\js\\react\\PostsContainer.js",
+      "PackagePath": "staticwebassets\\js\\react\\PostsContainer.js"
+    },
+    {
       "Id": "E:\\Kino2\\cinemanic\\wwwroot\\js\\site.js",
       "PackagePath": "staticwebassets\\js\\site.js"
     },

@@ -12,5 +12,6 @@
         public bool Adult { get; set; }
 
         public List<string> Genres { get; set; } = new();
+        public List<Screening> Screenings { get; set; } = new();
     }
 }

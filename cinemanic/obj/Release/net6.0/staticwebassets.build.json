@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZpFSDWjle7b4Dvq7v4+IYTjn3xh8ykxwVlefQISDvco=",
+  "Hash": "L6CXwuFeAlRJlmeQTLLA4FF39kKcMGwGZ/1/QnmIZqM=",
   "Source": "cinemanic",
   "BasePath": "_content/cinemanic",
   "Mode": "Default",
@@ -1120,6 +1120,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\favicon.ico"
+    },
+    {
+      "Identity": "E:\\Kino2\\cinemanic\\wwwroot\\js\\react\\PostsContainer.js",
+      "SourceId": "cinemanic",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Kino2\\cinemanic\\wwwroot\\",
+      "BasePath": "_content/cinemanic",
+      "RelativePath": "js/react/PostsContainer.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\react\\PostsContainer.js"
     },
     {
       "Identity": "E:\\Kino2\\cinemanic\\wwwroot\\js\\site.js",

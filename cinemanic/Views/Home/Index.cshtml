@@ -2,17 +2,24 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    <p><a href="http://localhost:5274/seanse">seanse</a></p>
-    <p><a href="http://localhost:5274/bilety">bilety</a></p>
-    <p><a href="http://localhost:5274/zamowienia">zamowienia</a></p>
+@section Scripts {
+    <script type="module" src="~/js/react/PostsContainer.js"></script>
+    <script src="https://unpkg.com/react/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom/umd/react-dom.production.min.js"></script>
+
+}
+
+
+<div class="text-center mb-5">
+    <h1 class="display-2 mb-4">Cinemanic</h1>
+    <p class="display-4 mb-4"><a href="http://localhost:5274/seanse">seanse</a></p>
+    <p class="display-4 mb-4"><a href="http://localhost:5274/bilety">bilety</a></p>
+    <p class="display-4 mb-4"><a href="http://localhost:5274/zamowienia">zamowienia</a></p>
 </div>
 
 @model PostMovieViewModel
 
-<div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+<div id="carouselExampleIndicators" class="carousel slide  mb-5" data-bs-ride="carousel">
     <div class="carousel-indicators">
         @{
             int count = 0;
@@ -49,34 +56,107 @@
     </button>
 </div>
 
-@foreach (var post in Model.Posts)
-{
-    <h2>@Html.Raw(post.Title.Rendered)</h2>
-    @if (!string.IsNullOrEmpty(post.FeaturedMediaUrl))
+<div class="row">
+    @foreach (var post in Model.Posts)
     {
-        <img src="@post.FeaturedMediaUrl" alt="@post.Title.Rendered" class="post-image" />
-    }
-    <p>@Html.Raw(post.Content.Rendered)</p>
-
-}
-
-@foreach (var movie in Model.MoviesInfo)
-{
-    <h2>@movie.Title</h2>
-    <img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath">
-    <p>@movie.Description</p>
-    <p>Release Date: @movie.ReleaseDate.Value.ToShortDateString()</p>
-    <p>Duration: @movie.Duration minutes</p>
-    <p>Polish Made: @movie.PolishMade</p>
-    <p>Adult: @movie.Adult</p>
-    <p>Genres: @string.Join(", ", movie.Genres)</p>
-    @if (!string.IsNullOrEmpty(movie.Trailer))
-    {
-        <div>
-            <p>Trailer:</p>
-            <div>
-                <iframe width="560" height="315" src="@("http://www.youtube.com/embed/" + movie.Trailer)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+        <div class="col-sm-4 mb-4">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(post.FeaturedMediaUrl))
+                {
+                    <a href="@post.Link"><img src="@post.FeaturedMediaUrl" alt="@post.Title.Rendered" class="card-img-top post-images" /></a>
+                }
             </div>
         </div>
     }
+</div>
+
+@{
+    int movieNr = 1;
+    @foreach (var movie in Model.MoviesInfo)
+    {
+        <h2 class="mt-4">@movie.Title</h2>
+        <div class="row justify-content-between">
+          <div class="col-md-2">
+            <img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath" class="moviePoster">
+          </div>
+          <div class="col-md-6 d-flex align-items-center">
+            <p>@movie.Description</p>
+          </div>
+          <div class="col-md-2 d-flex justify-content-center flex-column">
+            <h4>Seanse</h4>
+            <ul class="screeningDatesList">
+              @foreach (var screening in movie.Screenings) {
+                <li>@screening.ScreeningDate.ToString("dd-MM  HH:mm")</li>
+              }
+            </ul>
+          </div>
+        </div>
+        <div class="accordion mt-3" id="movieDesc@(movieNr)Accordion">
+                <div class="card">
+                    <div class="card-header" id="movieDesc@(movieNr)Header">
+                        <h3 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#movieDesc@(movieNr)Collapse" aria-expanded="false" aria-controls="movieDesc@(movieNr)Collapse">
+                                Informacje:
+                            </button>
+                        </h3>
+                    </div>
+                    <div id="movieDesc@(movieNr)Collapse" class="collapse" aria-labelledby="movieDesc@(movieNr)Header" data-parent="#movieDesc@(movieNr)Accordion">
+                        <div class="card-body">
+                            <p>Release Date: @movie.ReleaseDate.Value.ToShortDateString()</p>
+                            <p>Duration: @movie.Duration minutes</p>
+                            <p>Polish Made: @movie.PolishMade</p>
+                            <p>Adult: @movie.Adult</p>
+                            <p>Genres: @string.Join(", ", movie.Genres)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    
+        @if (!string.IsNullOrEmpty(movie.Trailer))
+        {
+            <div class="accordion" id="trailer@(movieNr)Accordion">
+                <div class="card">
+                    <div class="card-header" id="trailer@(movieNr)Header">
+                        <h3 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#trailer@(movieNr)Collapse" aria-expanded="false" aria-controls="trailer@(movieNr)Collapse">
+                                Trailer:
+                            </button>
+                        </h3>
+                    </div>
+                    <div id="trailer@(movieNr)Collapse" class="collapse" aria-labelledby="trailer@(movieNr)Header" data-parent="#trailer@(movieNr)Accordion">
+                        <div class="card-body">
+                            <iframe width="560" height="315" src="@("http://www.youtube.com/embed/" + movie.Trailer)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    movieNr++;
+    }
 }
+
+<div class="row mt-5">
+    @foreach (var post in Model.Posts)
+    {
+        <div class="col-sm-4 mb-4">
+            <div class="card">
+                @if (!string.IsNullOrEmpty(post.FeaturedMediaUrl))
+                {
+                    <img src="@post.FeaturedMediaUrl" alt="@post.Title.Rendered" class="card-img-top post-images" />
+                }
+                <div class="card-body">
+                    <h5 class="card-title">@Html.Raw(post.Title.Rendered)</h5>
+                    <p class="card-text">@Html.Raw(post.Content.Rendered)</p>
+                    <a href="@post.Link" class="btn btn-primary">Read more</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div id="posts-container"></div>
+
+<script>
+  ReactDOM.render(PostsContainer, document.getElementById('posts-container'));
+</script>
+
