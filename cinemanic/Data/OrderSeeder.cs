@@ -1,5 +1,4 @@
-﻿using Bogus;
-using cinemanic.Models;
+﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace cinemanic.Data

@@ -29,8 +29,30 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                   <ul class="navbar-nav flex-grow-1">
-                        
+                    <ul class="navbar-nav flex-grow-1">
+                        @{
+                            bool isAdmin = false;
+                            if (SignInManager.IsSignedIn(User))
+                            {
+                                var user = await UserManager.GetUserAsync(User);
+                                if (user != null)
+                                {
+                                    isAdmin = await UserManager.IsInRoleAsync(user, "Admin");
+                                }
+                            }
+                        }
+                        @if (isAdmin)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Screenings" asp-action="Admin">Seanse</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Tickets" asp-action="Admin">Bilety</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Orders" asp-action="Admin">Zamówienia</a>
+                            </li>
+                        }
                     </ul>
                     <ul class="navbar-nav">
                         @if (SignInManager.IsSignedIn(User))
@@ -66,7 +88,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container">
-            &copy; 2023 - cinemanic - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            &copy; 2023 - cinemanic - testing tmdb api
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>

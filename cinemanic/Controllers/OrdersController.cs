@@ -19,7 +19,7 @@ namespace cinemanic.Controllers
 
         [HttpGet("")]
         [Authorize]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Admin()
         {
             var cinemanicDbContext = _context.Orders.Include(o => o.Account);
             return View(await cinemanicDbContext.ToListAsync());
@@ -46,32 +46,25 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("create")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public IActionResult Create()
         {
             ViewData["AccountId"] = new SelectList(_context.Accounts, "Id", "Id");
             return View();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("create")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TotalPrice,AccountId")] Order order)
         {
-            if (!ModelState.IsValid)
-            {
-                _context.Add(order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "Id", "Id", order.AccountId);
-            return View(order);
+            _context.Add(order);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Admin));
         }
 
         [HttpGet("edit/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -88,10 +81,8 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost("edit/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,TotalPrice,AccountId")] Order order)
         {
@@ -100,32 +91,14 @@ namespace cinemanic.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(order);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!OrderExists(order.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            ViewData["AccountId"] = new SelectList(_context.Accounts, "Id", "Id", order.AccountId);
-            return View(order);
+            _context.Update(order);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction(nameof(Admin));
         }
 
         [HttpGet("delete/{id}")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -145,7 +118,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("delete/{id}"), ActionName("Delete")]
-        [Authorize(Roles = "Admin")]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

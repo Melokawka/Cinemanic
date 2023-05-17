@@ -1,77 +1,94 @@
-﻿@model IEnumerable<cinemanic.Models.Screening>
+﻿@model ScreeningViewModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Seanse";
 }
 
-<h1>Index</h1>
+<h1>Seanse</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ScreeningDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Subtitles)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Lector)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Dubbing)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Is3D)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SeatsLeft)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Room)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Movie)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ScreeningDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Subtitles)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Lector)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Dubbing)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Is3D)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SeatsLeft)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Room.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Movie.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
+<h3>@Model.CurrentPaginatedDate</h3>
+@{
+    int movieNr = 1;
+    @foreach (var movie in Model.MoviesInfo)
+    {
+        <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><h2 class="mt-4">@movie.Title</h2></a>
+        <div class="row justify-content-between">
+            <div class="col-md-2">
+                <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath" class="moviePoster"></a>
+            </div>
+            <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
+                <h4>Seanse</h4>
+                <ul class="screeningDatesList">
+                    @foreach (var screening in movie.Screenings)
+                    {
+                    @if (@screening.ScreeningDate.ToString("dd-MM-yyyy") == @Model.CurrentPaginatedDate)
+                        {
+                            <li>
+                                <a asp-controller="Tickets" asp-action="Buy" asp-route-screeningId="@screening.Id" asp-route-movieId="@movie.Id">
+                                    @screening.ScreeningDate.ToString("HH:mm")
+                                </a>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+        </div>
+        <div class="accordion mt-3" id="movieDesc@(movieNr)Accordion">
+            <div class="card">
+                <div class="card-header" id="movieDesc@(movieNr)Header">
+                    <h3 class="mb-0">
+                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#movieDesc@(movieNr)Collapse" aria-expanded="false" aria-controls="movieDesc@(movieNr)Collapse">
+                            Informacje:
+                        </button>
+                    </h3>
+                </div>
+                <div id="movieDesc@(movieNr)Collapse" class="collapse" aria-labelledby="movieDesc@(movieNr)Header" data-parent="#movieDesc@(movieNr)Accordion">
+                    <div class="card-body">
+                        <p>Release Date: @movie.ReleaseDate.Value.ToShortDateString()</p>
+                        <p>Duration: @movie.Duration minutes</p>
+                        <p>Polish Made: @movie.PolishMade</p>
+                        <p>Adult: @movie.Adult</p>
+                        <p>Genres: @string.Join(", ", movie.Genres)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        movieNr++;
+    }
 }
-    </tbody>
-</table>
+
+<!-- Pagination -->
+@if (ViewBag.TotalPages > 1)
+{
+    <nav class="mt-5" aria-label="Page navigation">
+        <ul class="pagination d-flex justify-content-between">
+            @if (ViewBag.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(ViewBag.CurrentPage - 1)">Poprzednie</a>
+                </li>
+            }
+
+            <div class="d-flex flex-row">
+                @for (int i = 1; i <= ViewBag.TotalPages; i++)
+                {
+                <li class="page-item @(i == ViewBag.CurrentPage ? "active" : "")">
+                    <a class="page-link" href="?page=@i">@i</a>
+                </li>
+                }
+            </div>
+
+            @if (ViewBag.CurrentPage < ViewBag.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" href="?page=@(ViewBag.CurrentPage + 1)">Następne</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+
+
+

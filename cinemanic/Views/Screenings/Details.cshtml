@@ -1,66 +1,49 @@
-﻿@model cinemanic.Models.Screening
+﻿@model cinemanic.Models.MovieInfo
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Film";
 }
 
-<h1>Details</h1>
+<h1>Film</h1>
 
-<div>
-    <h4>Screening</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ScreeningDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ScreeningDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Subtitles)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Subtitles)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Lector)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Lector)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Dubbing)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Dubbing)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Is3D)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Is3D)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.SeatsLeft)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.SeatsLeft)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Room)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Room.Id)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Movie)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Movie.Id)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div>
+@{
+    <h2 class="mt-4">@Model.Title</h2>
+    <div class="row justify-content-between">
+        <div class="col-md-2">
+        <img src="https://image.tmdb.org/t/p/w500/@Model.PosterPath" class="moviePoster">
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <p>@Model.Description</p>
+        </div>
+        <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
+            <h4>Seanse</h4>
+            <ul class="screeningDatesList">
+            @foreach (var screening in Model.Screenings)
+                {
+                    <li>@screening.ScreeningDate.ToString("dd-MM-yyyy  HH:mm")</li>
+                }
+            </ul>
+        </div>
+    </div>
+    <div class="accordion mt-3" id="movieDescAccordion">
+        <div class="card">
+            <div class="card-header" id="movieDescHeader">
+                <h3 class="mb-0">
+                    <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#movieDescCollapse" aria-expanded="false" aria-controls="movieDescCollapse">
+                        Informacje:
+                    </button>
+                </h3>
+            </div>
+            <div id="movieDescCollapse" class="collapse" aria-labelledby="movieDescHeader" data-parent="#movieDescAccordion">
+                <div class="card-body">
+                <p>Release Date: @Model.ReleaseDate.Value.ToShortDateString()</p>
+                <p>Duration: @Model.Duration minutes</p>
+                <p>Polish Made: @Model.PolishMade</p>
+                <p>Adult: @Model.Adult</p>
+                <p>Genres: @string.Join(", ", Model.Genres)</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+}

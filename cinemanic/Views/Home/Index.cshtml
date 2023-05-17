@@ -1,5 +1,5 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Strona Główna";
 }
 
 @section Scripts {
@@ -9,13 +9,18 @@
 
 }
 
-
-<div class="text-center mb-5">
-    <h1 class="display-2 mb-4">Cinemanic</h1>
-    <p class="display-4 mb-4"><a href="http://localhost:5274/seanse">seanse</a></p>
-    <p class="display-4 mb-4"><a href="http://localhost:5274/bilety">bilety</a></p>
-    <p class="display-4 mb-4"><a href="http://localhost:5274/zamowienia">zamowienia</a></p>
+<div class="container" style="padding: 0 0 0 0 !important;">
+  <div class="row">
+    <div class="col text-center">
+      <h1 class="display-2 mb-4">Cinemanic</h1>
+      <div class="btn-group-vertical w-100">
+        <a class="btn btn-secondary btn-lg btn-block mb-5" href="http://localhost:5274/seanse" role="button">Seanse</a>
+      </div>
+    </div>
+  </div>
 </div>
+
+
 
 @model PostMovieViewModel
 
@@ -74,19 +79,20 @@
     int movieNr = 1;
     @foreach (var movie in Model.MoviesInfo)
     {
-        <h2 class="mt-4">@movie.Title</h2>
+        <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><h2 class="mt-4">@movie.Title</h2></a>
+        
         <div class="row justify-content-between">
           <div class="col-md-2">
-            <img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath" class="moviePoster">
+                <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath" class="moviePoster"></a>
           </div>
           <div class="col-md-6 d-flex align-items-center">
             <p>@movie.Description</p>
           </div>
-          <div class="col-md-2 d-flex justify-content-center flex-column">
+          <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
             <h4>Seanse</h4>
             <ul class="screeningDatesList">
               @foreach (var screening in movie.Screenings) {
-                <li>@screening.ScreeningDate.ToString("dd-MM  HH:mm")</li>
+                <li>@screening.ScreeningDate.ToString("dd-MM-yyyy  HH:mm")</li>
               }
             </ul>
           </div>

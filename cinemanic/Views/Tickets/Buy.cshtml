@@ -1,0 +1,107 @@
+﻿@model cinemanic.Models.Ticket
+
+@{
+    ViewData["Title"] = "Kup bilet";
+}
+
+<h1>Kup bilet</h1>
+<hr />
+
+<div class="row">
+    <div class="col-md-4">
+        <img src="https://image.tmdb.org/t/p/w500/@ViewBag.MoviePoster">
+        <form asp-action="Buy">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">Film</label>
+                <input class="form-control" value="@ViewBag.MovieTitle" readonly />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Seans</label>
+                <input class="form-control" value="@ViewBag.ScreeningDate" readonly />
+            </div>            
+            <div class="form-group">
+                <label asp-for="PricingType" class="control-label"></label>
+                <select asp-for="PricingType" class="form-control" asp-items="ViewBag.PricingTypes" id="pricingTypeSelect"></select>
+                <span asp-validation-for="PricingType" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Seat" class="control-label"></label>
+                <input asp-for="Seat" class="form-control" />
+                <span asp-validation-for="Seat" class="text-danger"></span>
+            </div>
+            
+            <div class="form-group">
+                <label class="control-label">Napisy</label>
+                <input class="form-control" value="@ViewBag.ScreeningSubtitles" readonly />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Lektor</label>
+                <input class="form-control" value="@ViewBag.ScreeningLector" readonly />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Dubbing</label>
+                <input class="form-control" value="@ViewBag.ScreeningDubbing" readonly />
+            </div>
+            <div class="form-group">
+                <label class="control-label">3D</label>
+                <input class="form-control" value="@ViewBag.Screening3d" readonly />
+            </div>
+            <div class="form-group">
+                <label class="control-label">Sala</label>
+                <input class="form-control" value="@ViewBag.ScreeningRoom" readonly />
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="OrderId" class="control-label"></label>
+                <input asp-for="OrderId" class="form-control" value="@ViewBag.OrderId" readonly />
+                <span asp-validation-for="OrderId" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="ScreeningId" class="control-label"></label>
+                <input asp-for="ScreeningId" class="form-control" value="@ViewBag.ScreeningId" />
+                <span asp-validation-for="ScreeningId" class="text-danger"></span>
+            </div>
+            <div class="form-group" hidden>
+                <label asp-for="TicketPrice" class="control-label"></label>
+                <input asp-for="TicketPrice" class="form-control" value="@ViewBag.Price" />
+                <span asp-validation-for="TicketPrice" class="text-danger"></span>
+            </div>
+            <div class="form-group mt-3">
+                <input type="submit" value="Kup" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<h3 class="mt-3 mb-3" id="ticketPrice">@ViewBag.Price</h3>
+
+<div class="mt-3">
+    <a asp-action="Index">Back to List</a>
+</div>
+
+<script>
+    // Get references to the select element and input field
+    var pricingTypeSelect = document.getElementById('pricingTypeSelect');
+    var priceText = document.getElementById('ticketPrice');
+
+    // Add event listener to the select element
+    pricingTypeSelect.addEventListener('change', function () {
+        // Get the selected option value
+        var selectedValue = pricingTypeSelect.value;
+
+        // Now you can compare the pricingType value
+        if (selectedValue == 'NORMALNY') {
+            priceText.textContent = '@ViewBag.Price';
+        }
+        else if (selectedValue == 'ULGOWY') {
+            priceText.textContent = '@(ViewBag.Price * 0.5)';
+        }
+    });
+</script>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+}

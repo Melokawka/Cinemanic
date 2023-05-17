@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "vobD2m+4yhB2kf/vYNtzwV9usvgGNP0PhdEiB1sCOO5CpKJvCFQC6pF4vxaCeTohA7nwKt7IePD9hI5X+/EkdA==",
+  "dgSpecHash": "NWwCoqGvtAf+ynKgw0LpAdoBkxbk0M+xGnJyNGUxGDHcADoYjKLTEo2sx+TJdjTtaqO7JsNzZwquTsWqUxGhUg==",
   "success": true,
   "projectFilePath": "E:\\Kino2\\cinemanic\\cinemanic.csproj",
   "expectedPackageFiles": [
@@ -132,6 +132,7 @@
     "C:\\Users\\Jamistrz\\.nuget\\packages\\runtime.ubuntu.14.04-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.ubuntu.14.04-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "C:\\Users\\Jamistrz\\.nuget\\packages\\runtime.ubuntu.16.04-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.ubuntu.16.04-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
     "C:\\Users\\Jamistrz\\.nuget\\packages\\runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl\\4.3.2\\runtime.ubuntu.16.10-x64.runtime.native.system.security.cryptography.openssl.4.3.2.nupkg.sha512",
+    "C:\\Users\\Jamistrz\\.nuget\\packages\\stripe.net\\41.16.0\\stripe.net.41.16.0.nupkg.sha512",
     "C:\\Users\\Jamistrz\\.nuget\\packages\\system.appcontext\\4.3.0\\system.appcontext.4.3.0.nupkg.sha512",
     "C:\\Users\\Jamistrz\\.nuget\\packages\\system.buffers\\4.5.1\\system.buffers.4.5.1.nupkg.sha512",
     "C:\\Users\\Jamistrz\\.nuget\\packages\\system.codedom\\4.4.0\\system.codedom.4.4.0.nupkg.sha512",
