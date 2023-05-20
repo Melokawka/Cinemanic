@@ -5,7 +5,7 @@ using System.Net.Http.Headers;
 
 namespace cinemanic.Data
 {
-    public class WordPressMockPostCreator
+    public class WordPressMockPosts
     {
         private readonly string _baseUrl = "http://localhost:8080";
         //private readonly string _username;

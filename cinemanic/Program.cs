@@ -98,7 +98,7 @@ namespace cinemanic
             pattern: "login",
             defaults: new { controller = "Accounts", action = "Login" });
 
-            await new WordPressMockPostCreator().UploadImageFromUrl();
+            //await new WordPressMockPosts().UploadImageFromUrl();
 
             using (var scope = app.Services.CreateScope())
             {
@@ -106,30 +106,73 @@ namespace cinemanic
 
                 var dbContext = services.GetRequiredService<CinemanicDbContext>();
 
-                dbContext.Database.EnsureDeleted();
-                dbContext.Database.EnsureCreated();
+                //dbContext.Database.EnsureDeleted();
+                //dbContext.Database.EnsureCreated();
 
-                await GenresService.GetGenres(dbContext);
+                if (!dbContext.Genres.Any())
+                {
+                    await GenresService.GetGenres(dbContext);
+                }
 
-                await MoviesService.GetMovies(dbContext);
+                if (!dbContext.Movies.Any())
+                {
+                    await MoviesService.GetMovies(dbContext);
+                }
 
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
 
                 var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
 
-                var adminRole = new ApplicationRole(ApplicationRole.Admin);
-                await roleManager.CreateAsync(adminRole);
+                var adminRoleName = ApplicationRole.Admin;
+                var userRoleName = ApplicationRole.User;
 
-                var userRole = new ApplicationRole(ApplicationRole.User);
-                await roleManager.CreateAsync(userRole);
+                if (!await roleManager.RoleExistsAsync(adminRoleName))
+                {
+                    var adminRole = new ApplicationRole(adminRoleName);
+                    await roleManager.CreateAsync(adminRole);
+                }
 
-                await AccountSeeder.SeedAccounts(userManager, dbContext);
-                RoomSeeder.SeedRooms(dbContext);
-                await LikeSeeder.SeedLikes(dbContext);
-                await NewsletterClientSeeder.SeedNewsletterClients(dbContext);
-                await ScreeningSeeder.SeedScreenings(dbContext);
-                await OrderSeeder.SeedOrders(dbContext);
-                await TicketSeeder.SeedTickets(dbContext);
+                if (!await roleManager.RoleExistsAsync(userRoleName))
+                {
+                    var userRole = new ApplicationRole(userRoleName);
+                    await roleManager.CreateAsync(userRole);
+                }
+
+                if (!dbContext.Accounts.Any())
+                {
+                    await AccountSeeder.SeedAccounts(userManager, dbContext);
+                }
+
+                if (!dbContext.Rooms.Any())
+                {
+                    RoomSeeder.SeedRooms(dbContext);
+                }
+
+                if (!dbContext.Likes.Any())
+                {
+                    await LikeSeeder.SeedLikes(dbContext);
+                }
+
+                if (!dbContext.NewsletterClients.Any())
+                {
+                    await NewsletterClientSeeder.SeedNewsletterClients(dbContext);
+                }
+
+                if (!dbContext.Screenings.Any())
+                {
+                    await ScreeningSeeder.SeedScreenings(dbContext);
+                }
+
+                if (!dbContext.Orders.Any())
+                {
+                    await OrderSeeder.SeedOrders(dbContext);
+                }
+
+                if (!dbContext.Tickets.Any())
+                {
+                    await TicketSeeder.SeedTickets(dbContext);
+                }
+
                 await IdentityDataInitializer.SeedData(userManager, roleManager);
             }
 

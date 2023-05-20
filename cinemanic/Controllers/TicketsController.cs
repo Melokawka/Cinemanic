@@ -83,31 +83,44 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Buy([FromForm] Ticket ticket)
         {
-            var hasDiscount = false;
-            if (ticket.PricingType == PricingType.ULGOWY) hasDiscount = true;
+            bool hasDiscount = (ticket.PricingType == PricingType.ULGOWY);
 
             var user = await _userManager.GetUserAsync(User);
 
-            var price = hasDiscount ? (ticket.TicketPrice / 2) : ticket.TicketPrice;
-            var account = await _context.Accounts.Select(a => a).FirstOrDefaultAsync(a => a.UserEmail == user.Email);
-
-            Order order = new Order
-            {
-                TotalPrice = price,
-                AccountId = account.Id,
-            };
+            var ticketPrice = hasDiscount ? (ticket.TicketPrice / 2) : ticket.TicketPrice;
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
 
             Ticket _ticket = new Ticket
             {
                 Seat = ticket.Seat,
                 PricingType = ticket.PricingType,
-                TicketPrice = price,
-                ScreeningId = ticket.ScreeningId,
-                OrderId = ticket.OrderId,
-                Order = order
+                TicketPrice = ticketPrice,
+                ScreeningId = ticket.ScreeningId
             };
 
-            _ticket.Order.TotalPrice = price;
+            Order activeOrder = await _context.Orders
+                .FirstOrDefaultAsync(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
+
+
+            if (activeOrder == null)
+            {
+                Order order = new Order
+                {
+                    TotalPrice = 0,
+                    AccountId = account.Id,
+                };
+
+                _ticket.OrderId = ticket.OrderId;
+                _ticket.Order = order;
+            }
+
+            else
+            {
+                _ticket.OrderId = activeOrder.Id;
+                _ticket.Order = activeOrder;
+            }
+
+            _ticket.Order.TotalPrice += _ticket.TicketPrice;
 
             _context.Add(_ticket);
             await _context.SaveChangesAsync();

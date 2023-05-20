@@ -17,6 +17,7 @@ namespace cinemanic.Data
                 {
                     TotalPrice = 0,
                     AccountId = accountIds[random.Next(accountIds.Count)],
+                    OrderStatus = OrderStatus.COMPLETED
                 };
 
                 dbContext.Orders.AddRange(order);

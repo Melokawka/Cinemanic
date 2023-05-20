@@ -1,0 +1,44 @@
+﻿@model List<cinemanic.Models.Ticket>
+
+<div class="container">
+    <h3>Koszyk</h3>
+    @{
+        if (Model.Any())
+        {
+            int ticketNr = 1;
+            <div class="accordion" id="accordion">
+                @foreach (var ticket in Model)
+                {
+                    <div class="accordion-item">
+                        <h2 class="accordion-header" id="heading@(ticketNr)">
+                            <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse@(ticketNr)" aria-controls="collapse@(ticketNr)">
+                                <p><strong>#@(ticketNr) </strong>@ticket.Screening.Movie.Title</p>
+                            </button>
+                        </h2>
+                        <div id="collapse@(ticketNr)" class="accordion-collapse collapse" aria-labelledby="heading@(ticketNr)" data-bs-parent="#accordion">
+                            <div class="accordion-body">
+                                <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
+                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
+                                <p><strong>Numer miejsca:</strong> @ticket.Seat</p>
+                            </div>
+                        </div>
+                    </div>
+                    ticketNr++;
+                }
+            </div>
+
+            decimal totalPrice = Model[0]?.Order.TotalPrice ?? 0;
+
+            <h3>Łączny koszt: @(totalPrice)</h3>
+            <form asp-controller="ShoppingCart" asp-action="Buy">
+                <div class="form-group">
+                    <input type="submit" value="Dalej" class="btn btn-primary" />
+                </div>
+            </form>
+        }
+        else
+        {
+            <p>Brak biletów w koszyku.</p>
+        }
+    }
+</div>

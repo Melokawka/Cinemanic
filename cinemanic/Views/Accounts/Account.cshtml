@@ -21,7 +21,9 @@
                 </div>
             </div>
         </div>
+
         <hr />
+
         <div class="accordion" id="ticketsAccordion">
             <div class="card">
                 <div class="card-header" id="ticketsHeader">
@@ -57,7 +59,9 @@
                 </div>
             </div>
         </div>
+
         <hr />
+
         <div class="accordion" id="archivedTicketsAccordion">
             <div class="card">
                 <div class="card-header" id="archivedTicketsHeader">
@@ -95,80 +99,78 @@
             </div>
         </div>
 
-    <hr />
-    <div class="col-md-8">
-        <div id="likesAccordion">
-            <div class="accordion">
-                <div class="card">
-                    <div class="card-header" id="likesHeader">
-                        <h3 class="mb-0">
-                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#likesCollapse" aria-expanded="false" aria-controls="likesCollapse">
-                                Polubione filmy
-                            </button>
-                        </h3>
-                    </div>
-                    <div id="likesCollapse" class="collapse" aria-labelledby="likesHeader" data-parent="#likesAccordion">
-                        <div class="card-body">
-                            @{
-                                @foreach (var like in Model.Likes)
-                                {
-                                    <div>
-                                        <p><strong>Tytuł Filmu:</strong> @like.Movie.Title</p>
-                                        <img src="https://image.tmdb.org/t/p/w500/@like.Movie.PosterPath">
-                                        <p>
-                                            Gatunki:
-                                            @{
-                                                var genreNames = new List<string>();
-                                                foreach (var genre in @like.Movie.Genres)
-                                                {
-                                                    genreNames.Add(genre.GenreName);
-                                                }
-                                                @string.Join(", ", genreNames)
-                                            }
-                                        </p>
-                                    </div>
-                                }
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <hr />
-    <div class="accordion" id="ordersAccordion">
-        <div class="card">
-            <div class="card-header" id="ordersHeader">
-                <h3 class="mb-0">
-                        <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#ordersCollapse" aria-expanded="false" aria-controls="ordersCollapse">
-                        Zamówienia
-                    </button>
-                </h3>
-            </div>
-            <div id="ordersCollapse" class="collapse" aria-labelledby="ordersHeader" data-parent="#ordersAccordion">
-                <div class="card-body">
-                    @{  
-                        var orderNr = 1;
-                        @foreach (var order in Model.Orders)
-                        {
-                            <div>
-                                <p><strong>Zamówienie @orderNr</strong></p>
-                                @foreach (var ticket in order.Tickets)
-                                {
-                                    <div>
-                                        <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
-                                        <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
-                                        <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
-                                    </div>
-                                }
-                            </div>
-                            orderNr++;
-                        }
-                    }
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+        <hr />
 
+        <div class="accordion" id="likesAccordion">
+            <div class="card">
+                <div class="card-header" id="likesHeader">
+                    <h3 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#likesCollapse" aria-expanded="false" aria-controls="likesCollapse">
+                            Polubione filmy
+                        </button>
+                    </h3>
+                </div>
+                <div id="likesCollapse" class="collapse" aria-labelledby="likesHeader" data-parent="#likesAccordion">
+                    <div class="card-body">
+                        @{
+                            @foreach (var like in Model.Likes)
+                            {
+                                <div>
+                                    <p><strong>Tytuł Filmu:</strong> @like.Movie.Title</p>
+                                    <img src="https://image.tmdb.org/t/p/w500/@like.Movie.PosterPath">
+                                    <p>
+                                        Gatunki:
+                                        @{
+                                            var genreNames = new List<string>();
+                                            foreach (var genre in @like.Movie.Genres)
+                                            {
+                                                genreNames.Add(genre.GenreName);
+                                            }
+                                            @string.Join(", ", genreNames)
+                                        }
+                                    </p>
+                                </div>
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <hr />
+
+        <div class="accordion" id="ordersAccordion">
+            <div class="card">
+                <div class="card-header" id="ordersHeader">
+                    <h3 class="mb-0">
+                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#ordersCollapse" aria-expanded="false" aria-controls="ordersCollapse">
+                            Zamówienia
+                        </button>
+                    </h3>
+                </div>
+                <div id="ordersCollapse" class="collapse" aria-labelledby="ordersHeader" data-parent="#ordersAccordion">
+                    <div class="card-body">
+                        @{  
+                            var orderNr = 1;
+                            @foreach (var order in Model.Orders)
+                            {
+                                <div>
+                                    <p><strong>Zamówienie @orderNr @order.OrderStatus</strong></p>
+                                    @foreach (var ticket in order.Tickets)
+                                    {
+                                        <div>
+                                            <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
+                                            <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
+                                            <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
+                                        </div>
+                                    }
+                                </div>
+                                orderNr++;
+                            }
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
 }

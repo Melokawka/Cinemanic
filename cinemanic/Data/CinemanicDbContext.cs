@@ -35,6 +35,9 @@ namespace cinemanic.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Ticket>()
+                .ToTable(t => t.HasTrigger("AddTicketTrigger"));
+
             modelBuilder.Entity<IdentityUserRole<string>>().ToTable("AspNetUserRoles");
             modelBuilder.Entity<IdentityUserClaim<string>>().ToTable("AspNetUserClaims");
             modelBuilder.Entity<IdentityUserLogin<string>>().ToTable("AspNetUserLogins");
