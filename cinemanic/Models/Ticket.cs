@@ -7,6 +7,7 @@
         public PricingType PricingType { get; set; }
         public decimal TicketPrice { get; set; }
         public int ScreeningId { get; set; }
+        public bool IsActive { get; set; }
         public Screening Screening { get; set; } = null!;
         public Order Order { get; set; } = null!;
         public int OrderId { get; set; }

@@ -3,7 +3,10 @@ using cinemanic.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
+using Stripe;
+using Stripe.Checkout;
 
 namespace cinemanic.Controllers
 {
@@ -55,15 +58,70 @@ namespace cinemanic.Controllers
                 return NotFound();
             }
 
-            Order order = _dbContext.Orders.FirstOrDefault(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
+            Order order = _dbContext.Orders
+                .Include(o => o.Tickets)
+                    .ThenInclude(t => t.Screening)
+                        .ThenInclude(s => s.Movie)
+                .FirstOrDefault(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
+
 
             order.OrderStatus = OrderStatus.SUBMITTED;
-
             _dbContext.Update(order);
-
             await _dbContext.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Index));
+            // Prepare the payment data
+            var lineItems = new List<SessionLineItemOptions>();
+
+            foreach (var ticket in order.Tickets)
+            {
+                var price = ticket.TicketPrice;
+
+                var productService = new ProductService();
+                var products = await productService.ListAsync();
+
+                // Find the corresponding Stripe product based on your criteria
+                var product = products.FirstOrDefault(p => p.Name == ticket.Screening.Movie.Title);
+
+                var lineItem = new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        Currency = "usd",
+                        UnitAmount = (long)(price * 100), // Price in cents/pence (e.g., $20.00)
+                        Product = product?.Id,
+                        //ProductData = new SessionLineItemPriceDataProductDataOptions
+                        //{
+                        //    Description = "Time: " + ticket.Screening.ScreeningDate.ToString("dd-MM-yyyy HH:mm") + " Seat: " + ticket.Seat,
+                        //},
+                    },
+                    Quantity = 1,
+                };
+                lineItems.Add(lineItem);
+            }
+
+            var options = new SessionCreateOptions
+            {
+                PaymentMethodTypes = new List<string> { "card" },
+                LineItems = lineItems,
+                Mode = "payment",
+                SuccessUrl = Request.Scheme + "://" + Request.Host.Value + "/platnosc/sukces?session_id={CHECKOUT_SESSION_ID}",
+                CancelUrl = "https://example.com/cancel",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "OrderId", order.Id.ToString() },
+                },
+            };
+
+            var service = new SessionService();
+            var session = service.Create(options);
+
+            //var sessionId = session.Id;
+            // Redirect the customer to the Stripe Checkout page using the sessionId
+            //var checkoutUrl = session.Url;
+
+            //return Redirect(checkoutUrl + "?sessionId=" + sessionId);
+            Response.Headers.Add("Location", session.Url);
+            return new StatusCodeResult(303);
         }
     }
 }

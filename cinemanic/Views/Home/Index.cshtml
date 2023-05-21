@@ -141,7 +141,7 @@
     }
 }
 
-<div class="row mt-5">
+<div class="row mt-5" id="posts-container">
     @foreach (var post in Model.Posts)
     {
         <div class="col-sm-4 mb-4">
@@ -160,9 +160,60 @@
     }
 </div>
 
-<div id="posts-container"></div>
+<div class="row"><button id="olderPostsButton" class="btn btn-primary">Starsze</button></div>
 
 <script>
-  ReactDOM.render(PostsContainer, document.getElementById('posts-container'));
+    $(document).ready(function () {
+        var currentPage = 1;
+
+        function getPosts(currentPage) {
+            $.ajax({
+                url: "/pobierz-posty",
+                data: { page: currentPage },
+                type: "GET",
+                dataType: "json",
+                success: function (posts) {
+                    var postsContainer = $("#posts-container");
+
+                    // Clear the existing posts
+                    postsContainer.empty();
+
+                    // Iterate through the returned posts and append them to the container
+                    for (var i = 0; i < posts.length; i++) {
+                        var post = posts[i];
+
+                        var card = $('<div class="col-sm-4 mb-4"><div class="card"></div></div>');
+
+                        if (post.featuredMediaUrl) {
+                            var img = $('<img class="card-img-top post-images" alt="' + post.title.rendered + '">');
+                            img.attr('src', post.featuredMediaUrl);
+                            card.find('.card').append(img);
+                        }
+
+                        var cardBody = $('<div class="card-body"></div>');
+                        cardBody.append('<h5 class="card-title">' + post.title.rendered + '</h5>');
+                        cardBody.append('<p class="card-text">' + post.content.rendered + '</p>');
+                        cardBody.append('<a href="' + post.link + '" class="btn btn-primary">Read more</a>');
+                        card.find('.card').append(cardBody);
+
+                        postsContainer.append(card);
+                    }
+                },
+
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+        function loadOlderPosts() {
+            currentPage++;
+            getPosts(currentPage);
+        }
+
+        $("#olderPostsButton").click(function () {
+            loadOlderPosts();
+        });
+    });
 </script>
 

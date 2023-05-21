@@ -5,12 +5,20 @@
       "PackagePath": "staticwebassets\\cinemanic.bundle.scp.css"
     },
     {
+      "Id": "E:\\Kino2\\cinemanic\\wwwroot\\css\\homepage.css",
+      "PackagePath": "staticwebassets\\css\\homepage.css"
+    },
+    {
       "Id": "E:\\Kino2\\cinemanic\\wwwroot\\css\\site.css",
       "PackagePath": "staticwebassets\\css\\site.css"
     },
     {
       "Id": "E:\\Kino2\\cinemanic\\wwwroot\\favicon.ico",
       "PackagePath": "staticwebassets\\favicon.ico"
+    },
+    {
+      "Id": "E:\\Kino2\\cinemanic\\wwwroot\\js\\react\\PostsContainer.js",
+      "PackagePath": "staticwebassets\\js\\react\\PostsContainer.js"
     },
     {
       "Id": "E:\\Kino2\\cinemanic\\wwwroot\\js\\site.js",

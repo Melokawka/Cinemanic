@@ -37,6 +37,7 @@ namespace cinemanic.Data
                     Seat = randomSeat,
                     PricingType = randomPricingType,
                     TicketPrice = (randomPricingType == PricingType.ULGOWY) ? (decimal)(random.Next(1100, 2300) * 0.01 * 0.5) : (decimal)(random.Next(1100, 2300) * 0.01),
+                    IsActive = true,
                     ScreeningId = randomScreeningId,
                     OrderId = orderIds[random.Next(orderIds.Count)],
                 };
@@ -79,6 +80,7 @@ namespace cinemanic.Data
                         Seat = randomSeat,
                         PricingType = randomPricingType,
                         TicketPrice = (randomPricingType == PricingType.ULGOWY) ? (decimal)(random.Next(1100, 2300) * 0.01 * 0.5) : (decimal)(random.Next(1100, 2300) * 0.01),
+                        IsActive = false,
                         ScreeningId = randomScreeningId,
                         OrderId = order.Id,
                         Order = order,

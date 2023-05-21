@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using cinemanic.Data;
 
@@ -11,9 +12,11 @@ using cinemanic.Data;
 namespace cinemanic.Migrations
 {
     [DbContext(typeof(CinemanicDbContext))]
-    partial class CinemanicDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230520233228_UpdateTicketModel")]
+    partial class UpdateTicketModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -236,9 +239,6 @@ namespace cinemanic.Migrations
 
                     b.Property<DateTime>("ArchiveDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
 
                     b.Property<int>("OrderId")
                         .HasColumnType("int");

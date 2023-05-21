@@ -94,6 +94,7 @@ namespace cinemanic.Controllers
             {
                 Seat = ticket.Seat,
                 PricingType = ticket.PricingType,
+                IsActive = false,
                 TicketPrice = ticketPrice,
                 ScreeningId = ticket.ScreeningId
             };
@@ -120,7 +121,7 @@ namespace cinemanic.Controllers
                 _ticket.Order = activeOrder;
             }
 
-            _ticket.Order.TotalPrice += _ticket.TicketPrice;
+            //_ticket.Order.TotalPrice += _ticket.TicketPrice;
 
             _context.Add(_ticket);
             await _context.SaveChangesAsync();

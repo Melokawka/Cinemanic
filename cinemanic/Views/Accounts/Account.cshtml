@@ -37,8 +37,10 @@
                     <div class="card-body">
                         @foreach (var ticket in Model.Tickets)
                         {
-                            <div>
-                                <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
+                            if (ticket.IsActive == true)
+                            {
+                                <div>
+                                <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))</p>
                                 <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
                                 <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
                                 <p><strong>Numer miejsca:</strong> @ticket.Seat</p>
@@ -54,6 +56,7 @@
                                     }
                                 </p>
                             </div>
+                            }
                         }
                     </div>
                 </div>
@@ -77,7 +80,7 @@
                             foreach (var archivedTicket in Model.ArchivedTickets)
                             {
                                 <div>
-                                    <p><strong>Data Seansu:</strong> @(archivedTicket.ScreeningDate.ToString())</p>
+                                    <p><strong>Data Seansu:</strong> @(archivedTicket.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))</p>
                                     <p><strong>Tytuł Filmu:</strong> @archivedTicket.Screening.Movie.Title</p>
                                     <img src="https://image.tmdb.org/t/p/w500/@archivedTicket.Screening.Movie.PosterPath">
                                     <p>

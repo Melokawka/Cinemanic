@@ -3,6 +3,7 @@ using cinemanic.Models;
 using cinemanic.Seeders;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Stripe;
 
 namespace cinemanic
 {
@@ -10,7 +11,11 @@ namespace cinemanic
     {
         public static async Task Main(string[] args)
         {
+            var stripeApiKey = "sk_test_51N864dCp4aYDEjGbkQaMMmeZsMB2U6UOnIoOwFeeIr1fBlOET4xV7gr7ArhPPmkXY90215DjmBaHZeTDm0E3nxAQ00jcgZV0Vf";
+
             var builder = WebApplication.CreateBuilder(args);
+
+            StripeConfiguration.ApiKey = stripeApiKey;
 
             builder.Services.AddCors(options =>
             {
@@ -117,6 +122,12 @@ namespace cinemanic
                 if (!dbContext.Movies.Any())
                 {
                     await MoviesService.GetMovies(dbContext);
+                }
+
+                StripeProductService stripe = new(dbContext);
+                if (!await stripe.HasProducts())
+                {
+                    await stripe.AddStripeProducts();
                 }
 
                 var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();

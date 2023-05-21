@@ -33,6 +33,7 @@ namespace cinemanic.Data
                     Seat = t.Seat,
                     PricingType = t.PricingType,
                     TicketPrice = t.TicketPrice,
+                    IsActive = false,
                     ScreeningId = t.ScreeningId,
                     Screening = t.Screening,
                     ScreeningDate = t.Screening.ScreeningDate,
