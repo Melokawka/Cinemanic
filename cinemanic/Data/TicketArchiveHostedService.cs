@@ -1,4 +1,6 @@
 ﻿using cinemanic.Data;
+using cinemanic.Models;
+using Microsoft.EntityFrameworkCore;
 
 public class TicketArchiveHostedService : IHostedService, IDisposable
 {
@@ -12,7 +14,7 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        _timer = new Timer(DoWork, null, TimeSpan.Zero, TimeSpan.FromDays(1));
+        _timer = new Timer(DoWork, null, TimeSpan.FromMinutes(1), TimeSpan.FromDays(1));
 
         return Task.CompletedTask;
     }
@@ -22,8 +24,29 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
         using (var scope = _serviceProvider.CreateScope())
         {
             var dbContext = scope.ServiceProvider.GetRequiredService<CinemanicDbContext>();
-            var ticketArchiveService = new TicketArchiveService(dbContext);
-            await ticketArchiveService.ExecuteArchiveAsync(CancellationToken.None);
+            var today = DateTime.Now;
+            var ticketsToArchive = await dbContext.Tickets
+                .Include(t => t.Screening)
+                .Include(t => t.Order)
+                .Where(t => t.Screening.ScreeningDate.Date < today)
+                .ToListAsync();
+
+            var archivedTickets = ticketsToArchive.Select(t => new ArchivedTicket
+            {
+                OrderId = t.OrderId,
+                Seat = t.Seat,
+                PricingType = t.PricingType,
+                TicketPrice = t.TicketPrice,
+                IsActive = false,
+                ScreeningId = t.ScreeningId,
+                Screening = t.Screening,
+                ScreeningDate = t.Screening.ScreeningDate,
+                ArchiveDate = today
+            }).ToList();
+
+            dbContext.ArchivedTickets.AddRange(archivedTickets);
+            dbContext.Tickets.RemoveRange(ticketsToArchive);
+            await dbContext.SaveChangesAsync();
         }
     }
 

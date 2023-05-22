@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "ZpFSDWjle7b4Dvq7v4+IYTjn3xh8ykxwVlefQISDvco=",
+  "Hash": "e/zWq2UPVde3q7c5Wa7lXCiWlWuA+D27xz3Y2Ss5yrQ=",
   "Source": "cinemanic",
   "BasePath": "_content/cinemanic",
   "Mode": "Default",
@@ -2106,6 +2106,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\lib\\jquery-validation-unobtrusive\\LICENSE.txt"
+    },
+    {
+      "Identity": "E:\\Kino2\\cinemanic\\wwwroot\\placeholders\\placeholder.jpg",
+      "SourceId": "cinemanic",
+      "SourceType": "Discovered",
+      "ContentRoot": "E:\\Kino2\\cinemanic\\wwwroot\\",
+      "BasePath": "_content/cinemanic",
+      "RelativePath": "placeholders/placeholder.jpg",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\placeholders\\placeholder.jpg"
     }
   ]
 }

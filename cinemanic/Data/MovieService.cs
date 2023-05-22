@@ -1,11 +1,15 @@
-﻿using cinemanic.Models;
+﻿using AutoMapper;
+using cinemanic.Models;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 
 namespace cinemanic.Data
 {
-    public class MoviesService
+    public class MovieService
     {
+        private readonly CinemanicDbContext _dbContext;
+
         private static HttpClient httpClient = new();
         private static JsonSerializerOptions jsonOptions = new();
 
@@ -14,6 +18,11 @@ namespace cinemanic.Data
         private static string apiEndpoint3;
 
         private static Random random = new Random();
+
+        public MovieService(CinemanicDbContext dbContext)
+        {
+            _dbContext = dbContext;
+        }
 
         public static string FindTrailerKey(string json)
         {
@@ -39,7 +48,6 @@ namespace cinemanic.Data
             do
             {
                 movieId = random.Next(10000, 100000);
-                Console.WriteLine(movieId);
 
                 apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
                 apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
@@ -51,7 +59,6 @@ namespace cinemanic.Data
             return movieId;
         }
 
-        //the errors are handled in getrandomid function
         private static async Task<Movie> GetMovie(CinemanicDbContext dbContext)
         {
             var response = await httpClient.GetFromJsonAsync<Movie>(apiEndpoint2, jsonOptions);
@@ -60,10 +67,9 @@ namespace cinemanic.Data
 
             var trailerLink = FindTrailerKey(json);
 
-            //response.Trailer = !String.IsNullOrEmpty(trailerLink) ? "https://www.youtube.com/watch?v=" + trailerLink : "";
             response.Trailer = !String.IsNullOrEmpty(trailerLink) ? trailerLink : "";
 
-            response.PosterPath = !String.IsNullOrEmpty(response.PosterPath) ? "https://image.tmdb.org/t/p/w200" + response.PosterPath : "";
+            response.PosterPath = !String.IsNullOrEmpty(response.PosterPath) ? response.PosterPath : "";
 
             return response;
         }
@@ -75,7 +81,7 @@ namespace cinemanic.Data
 
             jsonOptions.Converters.Add(new MovieConverter());
 
-            //retrieve 10 random movies from tmdb api
+            //retrieve random movies from tmdb api
             for (int i = 0; i < 5; i++)
             {
                 await GetRandomId();
@@ -85,12 +91,10 @@ namespace cinemanic.Data
             await using var transaction = await dbContext.Database.BeginTransactionAsync();
             try
             {
-                // Load existing genres from the database based on the IDs in the movies
                 var existingGenres = dbContext.Genres.ToList();
 
                 foreach (Movie movie in movies)
                 {
-                    // Associate existing genres with the movie
                     movie.Genres = movie.Genres.Select(genre =>
                     {
                         var existingGenre = existingGenres.FirstOrDefault(eg => eg.Id == genre.Id);
@@ -109,6 +113,32 @@ namespace cinemanic.Data
                 await transaction.RollbackAsync();
                 throw;
             }
+        }
+        public List<MovieInfo> GetMoviesInfo()
+        {
+            var movies = _dbContext.Movies
+                .Include(m => m.Genres)
+                .Include(m => m.Screenings)
+                .ToList();
+
+            var config = new MapperConfiguration(cfg =>
+            {
+                cfg.CreateMap<Movie, MovieInfo>()
+                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()))
+                    .ForMember(dest => dest.Screenings, opt => opt.MapFrom(src => src.Screenings.Select(s => s).ToList()));
+
+                cfg.CreateMap<Genre, string>().ConvertUsing(g => g.GenreName);
+            });
+
+            IMapper mapper = config.CreateMapper();
+            var moviesInfo = mapper.Map<List<Movie>, List<MovieInfo>>(movies);
+
+            foreach (var movie in moviesInfo)
+            {
+                movie.Screenings = movie.Screenings.OrderBy(s => s.ScreeningDate).ToList();
+            }
+
+            return moviesInfo;
         }
     }
 }

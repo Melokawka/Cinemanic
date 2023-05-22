@@ -1,7 +1,6 @@
 using cinemanic.Data;
 using cinemanic.Models;
 using cinemanic.Seeders;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Stripe;
 
@@ -31,21 +30,19 @@ namespace cinemanic
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddDbContext<CinemanicDbContext>();
-            //builder.Services.AddDbContext<CinemanicDbContext>(options =>
-            //    options.UseSqlServer(builder.Configuration.GetConnectionString("CinemanicDb")));
 
             builder.Services.AddHostedService<TicketArchiveHostedService>();
 
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<CinemanicDbContext>()
-                .AddDefaultTokenProviders();
+                .AddDefaultTokenProviders()
+                .AddRoles<ApplicationRole>();
 
-            builder.Services.AddAuthentication(options =>
-            {
-                options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-                //options.DefaultScheme = IdentityConstants.ApplicationScheme;
-            })
-            .AddCookie(options =>
+            builder.Services.AddScoped<SignInManager<ApplicationUser>>();
+
+            builder.Services.AddAuthentication();
+
+            builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = "_auth";
 
@@ -56,11 +53,7 @@ namespace cinemanic
                 options.Cookie.SameSite = SameSiteMode.None;
 
                 options.Cookie.HttpOnly = true;
-            });
 
-            builder.Services.ConfigureApplicationCookie(options =>
-            {
-                options.LoginPath = "/logowanie";
             });
 
             builder.Services.Configure<IdentityOptions>(options =>
@@ -77,6 +70,9 @@ namespace cinemanic
                 logging.AddConsole();
             });
 
+            builder.Services.AddScoped<PostService>();
+            builder.Services.AddScoped<MovieService>();
+
             var app = builder.Build();
 
             if (!app.Environment.IsDevelopment())
@@ -90,7 +86,6 @@ namespace cinemanic
 
             app.UseCors("AllowWordPressApi");
 
-            // apparently the order is important...
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -121,7 +116,19 @@ namespace cinemanic
 
                 if (!dbContext.Movies.Any())
                 {
-                    await MoviesService.GetMovies(dbContext);
+                    await MovieService.GetMovies(dbContext);
+                    var orders = dbContext.Orders.ToList();
+                    dbContext.Orders.RemoveRange(orders);
+                    await dbContext.SaveChangesAsync();
+
+                    var stripeProductService = new ProductService();
+
+                    var products = stripeProductService.List(new ProductListOptions { Limit = 20 }); // Increase the limit if you have more products
+
+                    foreach (var product in products)
+                    {
+                        stripeProductService.Delete(product.Id);
+                    }
                 }
 
                 StripeProductService stripe = new(dbContext);
@@ -151,6 +158,7 @@ namespace cinemanic
 
                 if (!dbContext.Accounts.Any())
                 {
+                    Console.WriteLine("seedowanie kont");
                     await AccountSeeder.SeedAccounts(userManager, dbContext);
                 }
 
@@ -172,11 +180,14 @@ namespace cinemanic
                 if (!dbContext.Screenings.Any())
                 {
                     await ScreeningSeeder.SeedScreenings(dbContext);
+                    //await dbContext.TruncateTicketsTableAsync();
+                    //await dbContext.TruncateOrdersTableAsync();
                 }
 
                 if (!dbContext.Orders.Any())
                 {
                     await OrderSeeder.SeedOrders(dbContext);
+                    //await dbContext.TruncateTicketsTableAsync();
                 }
 
                 if (!dbContext.Tickets.Any())

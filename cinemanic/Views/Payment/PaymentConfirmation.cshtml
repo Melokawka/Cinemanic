@@ -22,7 +22,7 @@
                         <div id="collapse@(ticketNr)" class="accordion-collapse collapse" aria-labelledby="heading@(ticketNr)" data-bs-parent="#accordion">
                             <div class="accordion-body">
                                 <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
-                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
+                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
                                 <p><strong>Numer miejsca:</strong> @ticket.Seat</p>
                             </div>
                         </div>

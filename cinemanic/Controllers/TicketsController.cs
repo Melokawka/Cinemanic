@@ -21,7 +21,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Admin()
         {
             var cinemanicDbContext = _context.Tickets.Include(t => t.Order).Include(t => t.Screening);
@@ -130,7 +130,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("create")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             var pricingTypes = Enum.GetValues(typeof(PricingType)).Cast<PricingType>();
@@ -142,7 +142,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId")] Ticket ticket)
         {
@@ -153,7 +153,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("edit/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Tickets == null)
@@ -176,7 +176,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("edit/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId")] Ticket ticket)
         {
@@ -192,7 +192,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("delete/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Tickets == null)
@@ -213,7 +213,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("delete/{id}"), ActionName("Delete")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

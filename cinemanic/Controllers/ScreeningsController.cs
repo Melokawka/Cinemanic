@@ -59,29 +59,31 @@ namespace cinemanic.Controllers
 
             var sortedDates = uniqueDates.OrderBy(date => DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture)).ToList();
 
-            int pageSize = 1; // Number of unique dates per page
-            int pageNumber = page ?? 1; // Current page number
+            int pageSize = 3; // Number of unique dates per page
+            int pageNumber = page ?? 1;
 
             var paginatedDates = sortedDates.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 
             ViewBag.CurrentPage = pageNumber;
             ViewBag.TotalPages = (int)Math.Ceiling((double)sortedDates.Count / pageSize);
 
-            var filteredMovies = moviesInfo.Where(movie => movie.Screenings.Any(screening => screening.ScreeningDate.Date.ToString("dd-MM-yyyy") == paginatedDates.FirstOrDefault())).ToList();
+            var filteredMovies = moviesInfo
+                .Where(movie => movie.Screenings
+                    .Any(screening => paginatedDates.Contains(screening.ScreeningDate.Date.ToString("dd-MM-yyyy"))))
+                .ToList();
 
-            var currentPaginatedDate = paginatedDates.FirstOrDefault();
+            var currentPaginatedDates = paginatedDates.ToList();
 
             var model = new ScreeningViewModel
             {
                 MoviesInfo = filteredMovies,
-                CurrentPaginatedDate = currentPaginatedDate
+                CurrentPaginatedDates = currentPaginatedDates
             };
 
             return View(model);
         }
 
-
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [HttpGet("admin")]
         public async Task<IActionResult> Admin()
         {
@@ -120,7 +122,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("create")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id");
@@ -129,7 +131,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ScreeningDate,Subtitles,Lector,Dubbing,Is3D,SeatsLeft,RoomId,MovieId")] Screening screening)
         {
@@ -140,7 +142,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("edit/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Screenings == null)
@@ -159,7 +161,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("edit/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,ScreeningDate,Subtitles,Lector,Dubbing,Is3D,SeatsLeft,RoomId,MovieId")] Screening screening)
         {
@@ -175,7 +177,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("delete/{id}")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Screenings == null)
@@ -196,7 +198,7 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("delete/{id}"), ActionName("Delete")]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

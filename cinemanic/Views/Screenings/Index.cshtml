@@ -6,33 +6,36 @@
 
 <h1>Seanse</h1>
 
-<h3>@Model.CurrentPaginatedDate</h3>
-@{
+@foreach (var currentPaginatedDate in @Model.CurrentPaginatedDates)
+{
+    <h3>@currentPaginatedDate</h3>
     int movieNr = 1;
     @foreach (var movie in Model.MoviesInfo)
     {
-        <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><h2 class="mt-4">@movie.Title</h2></a>
-        <div class="row justify-content-between">
-            <div class="col-md-2">
-                <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><img src="https://image.tmdb.org/t/p/w500/@movie.PosterPath" class="moviePoster"></a>
-            </div>
-            <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
-                <h4>Seanse</h4>
-                <ul class="screeningDatesList">
-                    @foreach (var screening in movie.Screenings)
-                    {
-                    @if (@screening.ScreeningDate.ToString("dd-MM-yyyy") == @Model.CurrentPaginatedDate)
+        if (movie.Screenings.Any(s => s.ScreeningDate.ToString("dd-MM-yyyy") == currentPaginatedDate))
+        {
+            <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><h2 class="mt-4">@movie.Title</h2></a>
+            <div class="row justify-content-between">
+                <div class="col-md-2">
+                    <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><img src="https://image.tmdb.org/t/p/w200/@movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="moviePoster"></a>
+                </div>
+                <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
+                    <h4>Seanse</h4>
+                    <ul class="screeningDatesList">
+                        @foreach (var screening in movie.Screenings)
                         {
-                            <li>
-                                <a asp-controller="Tickets" asp-action="Buy" asp-route-screeningId="@screening.Id" asp-route-movieId="@movie.Id">
-                                    @screening.ScreeningDate.ToString("HH:mm")
-                                </a>
-                            </li>
+                            @if (@screening.ScreeningDate.ToString("dd-MM-yyyy") == currentPaginatedDate)
+                            {
+                                <li>
+                                    <a asp-controller="Tickets" asp-action="Buy" asp-route-screeningId="@screening.Id" asp-route-movieId="@movie.Id">
+                                        @screening.ScreeningDate.ToString("HH:mm")
+                                    </a>
+                                </li>
+                            }
                         }
-                    }
-                </ul>
+                    </ul>
+                </div>
             </div>
-        </div>
         <div class="accordion mt-3" id="movieDesc@(movieNr)Accordion">
             <div class="card">
                 <div class="card-header" id="movieDesc@(movieNr)Header">
@@ -53,12 +56,11 @@
                 </div>
             </div>
         </div>
-
         movieNr++;
+        }
     }
 }
 
-<!-- Pagination -->
 @if (ViewBag.TotalPages > 1)
 {
     <nav class="mt-5" aria-label="Page navigation">

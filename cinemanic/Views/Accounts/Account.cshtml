@@ -42,7 +42,7 @@
                                 <div>
                                 <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))</p>
                                 <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
-                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
+                                    <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
                                 <p><strong>Numer miejsca:</strong> @ticket.Seat</p>
                                 <p>
                                     Gatunki:
@@ -82,7 +82,7 @@
                                 <div>
                                     <p><strong>Data Seansu:</strong> @(archivedTicket.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))</p>
                                     <p><strong>Tytuł Filmu:</strong> @archivedTicket.Screening.Movie.Title</p>
-                                    <img src="https://image.tmdb.org/t/p/w500/@archivedTicket.Screening.Movie.PosterPath">
+                                    <img src="https://image.tmdb.org/t/p/w500/@archivedTicket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
                                     <p>
                                         Gatunki:
                                         @{
@@ -120,7 +120,7 @@
                             {
                                 <div>
                                     <p><strong>Tytuł Filmu:</strong> @like.Movie.Title</p>
-                                    <img src="https://image.tmdb.org/t/p/w500/@like.Movie.PosterPath">
+                                    <img src="https://image.tmdb.org/t/p/w500/@like.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
                                     <p>
                                         Gatunki:
                                         @{
@@ -164,7 +164,7 @@
                                         <div>
                                             <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
                                             <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
-                                            <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
+                                            <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
                                         </div>
                                     }
                                 </div>

@@ -1,5 +1,9 @@
 ﻿@model List<cinemanic.Models.Ticket>
 
+@using Microsoft.AspNetCore.Identity
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
 <div class="container">
     <h3>Koszyk</h3>
     @{
@@ -18,7 +22,7 @@
                         <div id="collapse@(ticketNr)" class="accordion-collapse collapse" aria-labelledby="heading@(ticketNr)" data-bs-parent="#accordion">
                             <div class="accordion-body">
                                 <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
-                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath">
+                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
                                 <p><strong>Numer miejsca:</strong> @ticket.Seat</p>
                             </div>
                         </div>
@@ -29,12 +33,23 @@
 
             decimal totalPrice = Model[0]?.Order.TotalPrice ?? 0;
 
-            <h3>Łączny koszt: @(totalPrice)</h3>
+            <h3 class="mt-3">Łączny koszt: @(totalPrice)</h3>
+
             <form asp-controller="ShoppingCart" asp-action="Buy">
                 <div class="form-group">
-                    <input type="submit" value="Dalej" class="btn btn-primary" />
+                    <input type="submit" value="Dalej" class="btn btn-primary mt-3" />
                 </div>
+                <h6 id="mature-audiences-only" class="mt-3">Treści dla dojrzałych widowni</h6>
             </form>
+
+            @foreach (var ticket in Model)
+            {
+                @if (ticket.Screening.Movie.Adult)
+                {
+                    <script>document.getElementById('mature-audiences-only').innerHTML='Treści dla dojrzałych widowni'</script>
+                    break;
+                }
+            }
         }
         else
         {

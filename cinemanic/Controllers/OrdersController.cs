@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace cinemanic.Controllers
 {
     [Route("zamowienia")]
+    [Authorize(Roles = "Admin")]
     public class OrdersController : Controller
     {
         private readonly CinemanicDbContext _context;
@@ -17,8 +18,6 @@ namespace cinemanic.Controllers
             _context = context;
         }
 
-        [HttpGet("")]
-        [Authorize]
         public async Task<IActionResult> Admin()
         {
             var cinemanicDbContext = _context.Orders.Include(o => o.Account);
@@ -26,7 +25,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -46,7 +44,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("create")]
-        [Authorize]
         public IActionResult Create()
         {
             ViewData["AccountId"] = new SelectList(_context.Accounts, "Id", "Id");
@@ -54,7 +51,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("create")]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TotalPrice,AccountId")] Order order)
         {
@@ -64,7 +60,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("edit/{id}")]
-        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -82,7 +77,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("edit/{id}")]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,TotalPrice,AccountId")] Order order)
         {
@@ -98,7 +92,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet("delete/{id}")]
-        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null || _context.Orders == null)
@@ -118,7 +111,6 @@ namespace cinemanic.Controllers
         }
 
         [HttpPost("delete/{id}"), ActionName("Delete")]
-        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

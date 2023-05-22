@@ -79,20 +79,16 @@ namespace cinemanic.Controllers
                 var productService = new ProductService();
                 var products = await productService.ListAsync();
 
-                // Find the corresponding Stripe product based on your criteria
+                // Find the corresponding Stripe product
                 var product = products.FirstOrDefault(p => p.Name == ticket.Screening.Movie.Title);
 
                 var lineItem = new SessionLineItemOptions
                 {
                     PriceData = new SessionLineItemPriceDataOptions
                     {
-                        Currency = "usd",
-                        UnitAmount = (long)(price * 100), // Price in cents/pence (e.g., $20.00)
+                        Currency = "PLN",
+                        UnitAmount = (long)(price * 100), // Price in grosze
                         Product = product?.Id,
-                        //ProductData = new SessionLineItemPriceDataProductDataOptions
-                        //{
-                        //    Description = "Time: " + ticket.Screening.ScreeningDate.ToString("dd-MM-yyyy HH:mm") + " Seat: " + ticket.Seat,
-                        //},
                     },
                     Quantity = 1,
                 };
@@ -115,11 +111,6 @@ namespace cinemanic.Controllers
             var service = new SessionService();
             var session = service.Create(options);
 
-            //var sessionId = session.Id;
-            // Redirect the customer to the Stripe Checkout page using the sessionId
-            //var checkoutUrl = session.Url;
-
-            //return Redirect(checkoutUrl + "?sessionId=" + sessionId);
             Response.Headers.Add("Location", session.Url);
             return new StatusCodeResult(303);
         }

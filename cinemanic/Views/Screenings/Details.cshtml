@@ -10,7 +10,7 @@
     <h2 class="mt-4">@Model.Title</h2>
     <div class="row justify-content-between">
         <div class="col-md-2">
-        <img src="https://image.tmdb.org/t/p/w500/@Model.PosterPath" class="moviePoster">
+            <img src="https://image.tmdb.org/t/p/w500/@Model.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="moviePoster">
         </div>
         <div class="col-md-6 d-flex align-items-center">
             <p>@Model.Description</p>

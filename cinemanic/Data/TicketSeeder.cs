@@ -44,8 +44,16 @@ namespace cinemanic.Data
                 tickets.Add(ticket);
             }
 
-            if (!dbContext.Orders.Any(o => o.OrderStatus == OrderStatus.PENDING))
+            await dbContext.Tickets.AddRangeAsync(tickets);
+            await dbContext.SaveChangesAsync();
+            tickets.Clear();
+
+            if (dbContext.Orders.Count(o => o.OrderStatus == OrderStatus.PENDING) < accountIds.Count)
             {
+                var pendingOrders = dbContext.Orders.Where(o => o.OrderStatus == OrderStatus.PENDING);
+                dbContext.Orders.RemoveRange(pendingOrders);
+                await dbContext.SaveChangesAsync();
+
                 foreach (var account in accountIds)
                 {
                     var order = new Order { AccountId = account, TotalPrice = 0, OrderStatus = OrderStatus.PENDING };
@@ -59,11 +67,11 @@ namespace cinemanic.Data
             {
                 var order = await dbContext.Orders.SingleAsync(o => o.AccountId == account && o.OrderStatus == OrderStatus.PENDING);
 
-                Console.WriteLine("id konta " + account);
+                List<int> futureScreeningIds = await dbContext.Screenings.Where(s => s.ScreeningDate > DateTime.Now).Select(s => s.Id).ToListAsync();
 
                 for (var i = 0; i < 2; i++)
                 {
-                    int randomScreeningId = screeningIds[random.Next(screeningIds.Count)];
+                    int randomScreeningId = futureScreeningIds[random.Next(futureScreeningIds.Count)];
                     int roomId = await dbContext.Screenings.Where(s => s.Id == randomScreeningId).Select(s => s.RoomId).FirstOrDefaultAsync();
                     int seats = await dbContext.Rooms.Where(r => r.Id == roomId).Select(r => r.Seats).FirstOrDefaultAsync();
 
@@ -85,14 +93,9 @@ namespace cinemanic.Data
                         OrderId = order.Id,
                         Order = order,
                     };
-                    Console.WriteLine("cena " + ticket.TicketPrice);
-                    Console.WriteLine("id zamowienia " + ticket.Order.Id);
                     tickets.Add(ticket);
                 }
             }
-
-            foreach (Ticket info in tickets) foreach (var property in typeof(Ticket).GetProperties()) Console.WriteLine(property.Name + " = " + property.GetValue(info));
-
             await dbContext.Tickets.AddRangeAsync(tickets);
             await dbContext.SaveChangesAsync();
         }

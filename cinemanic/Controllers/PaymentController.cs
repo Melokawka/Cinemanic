@@ -9,6 +9,7 @@ using Stripe.Checkout;
 namespace cinemanic.Controllers
 {
     [Route("platnosc")]
+    [Authorize]
     public class PaymentController : Controller
     {
         private readonly CinemanicDbContext _dbContext;
@@ -18,7 +19,6 @@ namespace cinemanic.Controllers
         {
             _dbContext = dbContext;
             _userManager = userManager;
-            //StripeConfiguration.ApiKey = "sk_test_51N864dCp4aYDEjGbkQaMMmeZsMB2U6UOnIoOwFeeIr1fBlOET4xV7gr7ArhPPmkXY90215DjmBaHZeTDm0E3nxAQ00jcgZV0Vf";
         }
 
         public IActionResult Index()
@@ -26,7 +26,6 @@ namespace cinemanic.Controllers
             return View();
         }
 
-        [Authorize]
         [HttpGet("sukces")]
         public ActionResult PaymentSuccess([FromQuery] string session_id)
         {
@@ -47,7 +46,6 @@ namespace cinemanic.Controllers
             return RedirectToAction("PaymentConfirmation", new { orderId = order.Id });
         }
 
-        [Authorize]
         [HttpGet("potwierdzenie")]
         public IActionResult PaymentConfirmation(int orderId)
         {
@@ -73,6 +71,5 @@ namespace cinemanic.Controllers
 
             return View(order);
         }
-
     }
 }

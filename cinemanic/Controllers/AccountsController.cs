@@ -14,11 +14,13 @@ namespace cinemanic.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly CinemanicDbContext _dbContext;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public AccountsController(UserManager<ApplicationUser> userManager, CinemanicDbContext dbContext)
+        public AccountsController(UserManager<ApplicationUser> userManager, CinemanicDbContext dbContext, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _dbContext = dbContext;
+            _signInManager = signInManager;
         }
 
         [Route("logowanie")]
@@ -26,6 +28,40 @@ namespace cinemanic.Controllers
         public IActionResult Login()
         {
             return View();
+        }
+
+        [AllowAnonymous]
+        [Route("logowanie")]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<ActionResult> Login(LoginViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+
+                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.DateOfBirth, user.BirthDate.ToString("o")),
+                    };
+
+                    var authProperties = new AuthenticationProperties
+                    {
+                        IsPersistent = model.RememberMe
+                    };
+
+                    await _signInManager.SignInWithClaimsAsync(user, authProperties, claims);
+
+                    return RedirectToAction("Index", "Home");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "Invalid email or password.");
+                }
+            }
+            return View(model);
         }
 
         [Route("konto")]
@@ -72,8 +108,6 @@ namespace cinemanic.Controllers
                 .Where(o => o.Account.UserEmail == user.Email)
                 .ToList();
 
-            foreach (Order info in orders) foreach (var property in typeof(Order).GetProperties()) Console.WriteLine(property.Name + " = " + property.GetValue(info));
-
             var model = new AccountViewModel()
             {
                 Email = user.Email,
@@ -84,49 +118,6 @@ namespace cinemanic.Controllers
                 Orders = orders
             };
 
-            return View(model);
-        }
-
-        [AllowAnonymous]
-        [Route("logowanie")]
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Login(LoginViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                // Authenticate user
-                var user = await _userManager.FindByEmailAsync(model.Email);
-
-                if (user != null && await _userManager.CheckPasswordAsync(user, model.Password))
-                {
-                    // Create authentication cookie // below is default cause mine doesnt work CookieAuthenticationDefaults.AuthenticationScheme
-                    var claims = new List<Claim>
-                    {
-                        new Claim(ClaimTypes.NameIdentifier, user.Id),
-                        new Claim(ClaimTypes.DateOfBirth, user.BirthDate.ToString("o")),
-                        new Claim(ClaimTypes.Email, user.Email)
-                    };
-
-                    var identity = new ClaimsIdentity(claims, IdentityConstants.ApplicationScheme);
-                    //var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
-
-
-                    var principal = new ClaimsPrincipal(identity);
-                    var authProperties = new AuthenticationProperties
-                    {
-                        IsPersistent = model.RememberMe
-                    };
-
-                    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal, authProperties);
-
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    ModelState.AddModelError("", "Invalid email or password.");
-                }
-            }
             return View(model);
         }
 
@@ -157,7 +148,6 @@ namespace cinemanic.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    // Create authentication cookie
                     var identity = new ClaimsIdentity(IdentityConstants.ApplicationScheme);
                     identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
                     identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
@@ -169,18 +159,17 @@ namespace cinemanic.Controllers
                         IsPersistent = false
                     };
 
-                    // Create an account for the regular user
                     var userAccount = new Account
                     {
                         UserEmail = model.Email,
                         Birthdate = model.DateOfBirth,
-                        // set any other properties you need here
                     };
 
                     _dbContext.Accounts.Add(userAccount);
                     await _dbContext.SaveChangesAsync();
 
                     await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal, authProperties);
+                    //await _signInManager.SignInWithClaimsAsync(user, authProperties, claims);
 
                     return RedirectToAction("Index", "Home");
                 }

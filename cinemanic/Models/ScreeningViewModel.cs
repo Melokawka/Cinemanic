@@ -2,7 +2,7 @@
 {
     public class ScreeningViewModel
     {
-        public string CurrentPaginatedDate { get; set; }
+        public List<string> CurrentPaginatedDates { get; set; }
         public List<MovieInfo> MoviesInfo { get; set; } = new();
     }
 }

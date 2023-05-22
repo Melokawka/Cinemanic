@@ -60,29 +60,38 @@ namespace cinemanic.Data
             {
                 entity.HasKey(e => new { e.UserId, e.RoleId });
             });
-            /*modelBuilder.Entity<Movie>()
-            .HasMany(m => m.Genres)
-            .WithMany(g => g.Movies)
-            .UsingEntity<MovieGenre>(
-                mg => mg.HasOne<Genre>().WithMany(),
-                mg => mg.HasOne<Movie>().WithMany())
-            .ToTable("movie_genre")
-            .HasKey(mg => new { mg.MoviesId, mg.GenresId });*/
-
-            /*modelBuilder.Entity<Movie>()
-            .HasMany(m => m.Genres)
-            .WithOne(g => g.Movie)
-            .UsingEntity<MovieGenre>(
-                gm => gm.HasOne<Genre>().WithMany(),
-                gm => gm.HasOne<Movie>().WithMany())
-            .ToTable("genre_list")
-            .HasKey(gm => new { gm.MovieId, gm.Genre });
-
-            modelBuilder.Entity<Movie>()
-                .HasMany(m => m.Likes)
-                .WithOne(l => l.Movie)
-                .HasForeignKey(l => l.MovieId);*/
         }
 
+        public async Task TruncateScreeningsTableAsync()
+        {
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE Screenings;");
+        }
+
+        public async Task TruncateTicketsTableAsync()
+        {
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE Tickets;");
+        }
+
+        public async Task TruncateOrdersTableAsync()
+        {
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE Orders;");
+        }
+
+        public async Task TruncateLikesTableAsync()
+        {
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE Likes;");
+        }
+
+        public async Task TruncateRoomsTableAsync()
+        {
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE Rooms;");
+        }
+
+        public async Task TruncateAccountsTableAsync()
+        {
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE Accounts;");
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE AspNetUserRoles;");
+            await Database.ExecuteSqlRawAsync("TRUNCATE TABLE AspNetUsers;");
+        }
     }
 }

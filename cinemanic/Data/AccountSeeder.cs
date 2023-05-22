@@ -58,17 +58,17 @@ namespace cinemanic.Seeders
 
         private static string GenerateRandomEmail()
         {
-            // Logic to generate a random email address
             var faker = new Faker("pl");
             return faker.Internet.Email();
         }
 
         private static DateTime GenerateRandomBirthdate()
         {
-            // Logic to generate a random birthdate within a desired range
             var random = new Random();
+
             var startDateTime = new DateTime(1950, 1, 1);
             var endDateTime = DateTime.Now.Date;
+
             int range = (endDateTime - startDateTime).Days;
             return startDateTime.AddDays(random.Next(range));
         }
