@@ -36,11 +36,11 @@
             </div>
             <div id="movieDescCollapse" class="collapse" aria-labelledby="movieDescHeader" data-parent="#movieDescAccordion">
                 <div class="card-body">
-                <p>Release Date: @Model.ReleaseDate.Value.ToShortDateString()</p>
-                <p>Duration: @Model.Duration minutes</p>
-                <p>Polish Made: @Model.PolishMade</p>
-                <p>Adult: @Model.Adult</p>
-                <p>Genres: @string.Join(", ", Model.Genres)</p>
+                <p>Premiera: @Model.ReleaseDate.Value.ToShortDateString()</p>
+                <p>Czas trwania: @Model.Duration minut</p>
+                <p>Film polski: @(Model.PolishMade ? "Tak" : "Nie")</p>
+                <p>Dla dorosłych: @(Model.Adult ? "Tak" : "Nie")</p>
+                <p>Kategorie: @string.Join(", ", Model.Genres)</p>
                 </div>
             </div>
         </div>

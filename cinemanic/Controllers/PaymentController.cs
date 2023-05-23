@@ -21,11 +21,6 @@ namespace cinemanic.Controllers
             _userManager = userManager;
         }
 
-        public IActionResult Index()
-        {
-            return View();
-        }
-
         [HttpGet("sukces")]
         public ActionResult PaymentSuccess([FromQuery] string session_id)
         {
@@ -43,19 +38,22 @@ namespace cinemanic.Controllers
             _dbContext.Update(order);
             _dbContext.SaveChanges();
 
-            return RedirectToAction("PaymentConfirmation", new { orderId = order.Id });
+            return RedirectToAction("PaymentConfirmation", new { orderId = order.Id, session_id = session_id });
         }
 
         [HttpGet("potwierdzenie")]
-        public IActionResult PaymentConfirmation(int orderId)
+        public IActionResult PaymentConfirmation(int orderId, string session_id)
         {
+            var service = new SessionService();
+            Session session = service.Get(session_id);
+
             var order = _dbContext.Orders
                 .Include(o => o.Tickets)
                     .ThenInclude(t => t.Screening)
                         .ThenInclude(s => s.Movie)
                 .FirstOrDefault(o => o.Id == orderId);
 
-            if (order == null)
+            if (session == null || order == null)
             {
                 return NotFound();
             }

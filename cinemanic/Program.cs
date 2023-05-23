@@ -10,11 +10,9 @@ namespace cinemanic
     {
         public static async Task Main(string[] args)
         {
-            var stripeApiKey = "sk_test_51N864dCp4aYDEjGbkQaMMmeZsMB2U6UOnIoOwFeeIr1fBlOET4xV7gr7ArhPPmkXY90215DjmBaHZeTDm0E3nxAQ00jcgZV0Vf";
-
             var builder = WebApplication.CreateBuilder(args);
 
-            StripeConfiguration.ApiKey = stripeApiKey;
+            builder.Configuration.AddJsonFile("appsettings.secrets.json", optional: true, reloadOnChange: true);
 
             builder.Services.AddCors(options =>
             {
@@ -75,6 +73,8 @@ namespace cinemanic
 
             var app = builder.Build();
 
+            StripeConfiguration.ApiKey = app.Configuration["StripeApiSecretKey"];
+
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -98,7 +98,7 @@ namespace cinemanic
             pattern: "login",
             defaults: new { controller = "Accounts", action = "Login" });
 
-            //await new WordPressMockPosts().UploadImageFromUrl();
+            //await new WordPressSeederService(app.Configuration["WordpressApiKey"]).UploadImageFromUrl();
 
             using (var scope = app.Services.CreateScope())
             {
@@ -116,7 +116,9 @@ namespace cinemanic
 
                 if (!dbContext.Movies.Any())
                 {
-                    await MovieService.GetMovies(dbContext);
+                    var movieService = new MovieService(dbContext, app.Configuration);
+                    await movieService.GetMovies();
+
                     var orders = dbContext.Orders.ToList();
                     dbContext.Orders.RemoveRange(orders);
                     await dbContext.SaveChangesAsync();
@@ -158,7 +160,6 @@ namespace cinemanic
 
                 if (!dbContext.Accounts.Any())
                 {
-                    Console.WriteLine("seedowanie kont");
                     await AccountSeeder.SeedAccounts(userManager, dbContext);
                 }
 
@@ -180,14 +181,11 @@ namespace cinemanic
                 if (!dbContext.Screenings.Any())
                 {
                     await ScreeningSeeder.SeedScreenings(dbContext);
-                    //await dbContext.TruncateTicketsTableAsync();
-                    //await dbContext.TruncateOrdersTableAsync();
                 }
 
                 if (!dbContext.Orders.Any())
                 {
                     await OrderSeeder.SeedOrders(dbContext);
-                    //await dbContext.TruncateTicketsTableAsync();
                 }
 
                 if (!dbContext.Tickets.Any())

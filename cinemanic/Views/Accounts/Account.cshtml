@@ -3,7 +3,7 @@
 @{
     <h2>Moje konto</h2>
     <hr />
-    <div class="col-md-8">
+    <div>
         <div class="accordion" id="personalInfoAccordion">
             <div class="card">
                 <div class="card-header" id="personalInfoHeader">
@@ -39,13 +39,17 @@
                         {
                             if (ticket.IsActive == true)
                             {
-                                <div>
-                                <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))</p>
-                                <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
-                                    <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
-                                <p><strong>Numer miejsca:</strong> @ticket.Seat</p>
+                                <div class="mb-5">
                                 <p>
-                                    Gatunki:
+                                    <strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))
+                                    <br/>
+                                    <strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title
+                                </p>
+                                    <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="account-pics mb-3">
+                                <p>
+                                    <strong>Numer miejsca:</strong> @ticket.Seat
+                                    <br/>
+                                    <strong>Gatunki:</strong>
                                     @{
                                         var genreNames = new List<string>();
                                         foreach (var genre in @ticket.Screening.Movie.Genres)
@@ -79,12 +83,15 @@
                         @{
                             foreach (var archivedTicket in Model.ArchivedTickets)
                             {
-                                <div>
-                                    <p><strong>Data Seansu:</strong> @(archivedTicket.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))</p>
-                                    <p><strong>Tytuł Filmu:</strong> @archivedTicket.Screening.Movie.Title</p>
-                                    <img src="https://image.tmdb.org/t/p/w500/@archivedTicket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
+                                <div class="mb-5">
                                     <p>
-                                        Gatunki:
+                                        <strong>Data Seansu:</strong> @(archivedTicket.ScreeningDate.ToString("dd.MM.yyyy HH:mm"))
+                                        <br/>
+                                        <strong>Tytuł Filmu:</strong> @archivedTicket.Screening.Movie.Title
+                                    </p>
+                                    <img src="https://image.tmdb.org/t/p/w500/@archivedTicket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="account-pics mb-3">
+                                    <p>
+                                        <strong>Gatunki:</strong>
                                         @{
                                             var genreNames = new List<string>();
                                             foreach (var genre in @archivedTicket.Screening.Movie.Genres)
@@ -118,11 +125,11 @@
                         @{
                             @foreach (var like in Model.Likes)
                             {
-                                <div>
+                                <div class="mb-5">
                                     <p><strong>Tytuł Filmu:</strong> @like.Movie.Title</p>
-                                    <img src="https://image.tmdb.org/t/p/w500/@like.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
+                                    <img src="https://image.tmdb.org/t/p/w500/@like.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="account-pics mb-3">
                                     <p>
-                                        Gatunki:
+                                        <strong>Gatunki:</strong>
                                         @{
                                             var genreNames = new List<string>();
                                             foreach (var genre in @like.Movie.Genres)
@@ -158,16 +165,32 @@
                             @foreach (var order in Model.Orders)
                             {
                                 <div>
-                                    <p><strong>Zamówienie @orderNr @order.OrderStatus</strong></p>
-                                    @foreach (var ticket in order.Tickets)
-                                    {
-                                        <div>
-                                            <p><strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())</p>
-                                            <p><strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title</p>
-                                            <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';">
-                                        </div>
+                                    <h3><strong>Zamówienie @orderNr @order.OrderStatus</strong></h3>
+                                    @{
+                                        var ticketNr = 1;
+                                        @foreach (var ticket in order.Tickets)
+                                        {
+                                            <div class="mb-4">
+                                                <h4>Bilet @ticketNr</h4>
+                                                <p>
+                                                    <strong>Data Seansu:</strong> @(ticket.Screening.ScreeningDate.ToString())
+                                                    <br/>
+                                                    <strong>Tytuł Filmu:</strong> @ticket.Screening.Movie.Title
+                                                </p>
+                                                <img src="https://image.tmdb.org/t/p/w500/@ticket.Screening.Movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="account-pics">
+                                            </div>
+                                            ticketNr++;
+                                        }
+                                        @if (order.OrderStatus == OrderStatus.SUBMITTED)
+                                        {
+                                            <form action="@Url.Action("Pay", "ShoppingCart")" method="post">
+                                                <input type="hidden" name="orderId" value="@order.Id" />
+                                                <button type="submit" class="btn btn-primary">Opłać</button>
+                                            </form>
+                                        }
                                     }
                                 </div>
+                                <hr />
                                 orderNr++;
                             }
                         }

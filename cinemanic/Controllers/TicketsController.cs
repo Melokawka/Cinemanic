@@ -51,19 +51,20 @@ namespace cinemanic.Controllers
 
         [HttpGet("kup")]
         [Authorize]
-        public IActionResult Buy(int screeningId, int movieId)
+        public async Task<IActionResult> Buy(int screeningId, int movieId)
         {
             var pricingTypes = Enum.GetValues(typeof(PricingType)).Cast<PricingType>();
-
 
             var maxOrderId = _context.Orders.Max(o => o.Id);
             var nextOrderId = maxOrderId + 1;
 
-            var movie = _context.Movies.FirstOrDefault(m => m.Id == movieId);
-            var screening = _context.Screenings.FirstOrDefault(s => s.Id == screeningId);
+            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
+            var screening = await _context.Screenings.FirstOrDefaultAsync(s => s.Id == screeningId);
 
-            ViewBag.Price = 16.00;
+            var freeSeats = await GetFreeSeatsList(screeningId);
+
             ViewBag.PricingTypes = new SelectList(pricingTypes);
+            ViewBag.Seats = new SelectList(freeSeats);
             ViewBag.OrderId = nextOrderId;
             ViewBag.MoviePoster = movie.PosterPath;
             ViewBag.MovieTitle = movie.Title;
@@ -78,6 +79,18 @@ namespace cinemanic.Controllers
             return View();
         }
 
+        public async Task<List<int>> GetFreeSeatsList(int screeningId)
+        {
+            var seatsTaken = await _context.Tickets.Where(t => t.ScreeningId == screeningId && t.IsActive).Select(t => t.Seat).ToListAsync();
+            var seatsCount = await _context.Screenings.Where(s => s.Id == screeningId).Select(s => s.Room.Seats).FirstOrDefaultAsync();
+
+            List<int> freeSeats = Enumerable.Range(1, seatsCount).ToList()
+                .Except(seatsTaken).ToList();
+
+            return freeSeats;
+        }
+
+        // doesnt factor in the situation where the customer buys the same seat for the same screening twice
         [HttpPost("kup")]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -87,10 +100,12 @@ namespace cinemanic.Controllers
 
             var user = await _userManager.GetUserAsync(User);
 
+            ticket.TicketPrice = (decimal)await CalculatePrice(ticket.ScreeningId, ticket.Seat);
+
             var ticketPrice = hasDiscount ? (ticket.TicketPrice / 2) : ticket.TicketPrice;
             var account = await _context.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
 
-            Ticket _ticket = new Ticket
+            Ticket newTicket = new Ticket
             {
                 Seat = ticket.Seat,
                 PricingType = ticket.PricingType,
@@ -102,7 +117,6 @@ namespace cinemanic.Controllers
             Order activeOrder = await _context.Orders
                 .FirstOrDefaultAsync(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
 
-
             if (activeOrder == null)
             {
                 Order order = new Order
@@ -111,22 +125,63 @@ namespace cinemanic.Controllers
                     AccountId = account.Id,
                 };
 
-                _ticket.OrderId = ticket.OrderId;
-                _ticket.Order = order;
+                AssignTicketToOrder(newTicket, order);
             }
 
-            else
-            {
-                _ticket.OrderId = activeOrder.Id;
-                _ticket.Order = activeOrder;
-            }
+            else AssignTicketToOrder(newTicket, activeOrder);
 
-            //_ticket.Order.TotalPrice += _ticket.TicketPrice;
-
-            _context.Add(_ticket);
+            _context.Add(newTicket);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction(nameof(Details), new { id = _ticket.Id });
+            return RedirectToAction("Index", "Screenings");
+        }
+
+        private void AssignTicketToOrder(Ticket ticket, Order order)
+        {
+            ticket.OrderId = order.Id;
+            ticket.Order = order;
+        }
+
+        [HttpGet("oblicz-cene")]
+        public async Task<double> CalculatePrice(int screeningId, int seat)
+        {
+            var ticketPrice = 12.0 + (seat * 0.1);
+
+            var screening = await _context.Screenings.Where(s => s.Id == screeningId)
+                .Include(s => s.Movie)
+                .FirstOrDefaultAsync();
+
+            if (screening.Movie.Adult) ticketPrice += 2.0;
+
+            var seatsLeft = (await GetFreeSeatsList(screeningId)).Count;
+
+            if (seatsLeft < 10) ticketPrice += 3.0;
+
+            DateTime oneYearAgo = DateTime.Now.AddYears(-1);
+            bool isNewerThan1Year = (screening.Movie.ReleaseDate > oneYearAgo);
+
+            if (isNewerThan1Year) ticketPrice += 4.0;
+
+            return ticketPrice;
+        }
+
+        [HttpPost("usun/{id}")]
+        [Authorize]
+        public async Task<IActionResult> RemoveTicket(int id)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
+
+            var ticket = await _context.Tickets.FindAsync(id);
+            var isUsersTicket = await _context.Orders.AnyAsync(o => o.AccountId == account.Id && o.Id == ticket.OrderId);
+
+            if (ticket != null && isUsersTicket)
+            {
+                _context.Tickets.Remove(ticket);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index", "ShoppingCart");
         }
 
         [HttpGet("create")]
@@ -144,7 +199,7 @@ namespace cinemanic.Controllers
         [HttpPost("create")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId")] Ticket ticket)
+        public async Task<IActionResult> Create([Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId,IsActive")] Ticket ticket)
         {
             _context.Add(ticket);
             await _context.SaveChangesAsync();
@@ -178,7 +233,7 @@ namespace cinemanic.Controllers
         [HttpPost("edit/{id}")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId")] Ticket ticket)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId,IsActive")] Ticket ticket)
         {
             if (id != ticket.Id)
             {

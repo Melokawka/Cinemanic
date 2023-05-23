@@ -597,3 +597,4 @@ E:\Kino2\cinemanic\obj\Release\net6.0\cinemanic.pdb
 E:\Kino2\cinemanic\obj\Release\net6.0\cinemanic.genruntimeconfig.cache
 E:\Kino2\cinemanic\obj\Release\net6.0\ref\cinemanic.dll
 E:\Kino2\cinemanic\bin\Release\net6.0\Stripe.net.dll
+E:\Kino2\cinemanic\bin\Release\net6.0\appsettings.secrets.json

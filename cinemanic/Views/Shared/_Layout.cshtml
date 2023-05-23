@@ -76,8 +76,9 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="ShoppingCart" asp-action="Index">
-                                    <div class="shopping-cart-icon">
+                                    <div class="shopping-cart-icon flex d-flex">
                                         @Html.Raw(svgCode)
+                                        <span id="cart-quantity" style="font-size: small; vertical-align: bottom;">0</span>
                                     </div>
                                 </a>
                             </li>
@@ -111,10 +112,26 @@
     </div>
 
     <footer class="border-top footer text-muted">
-        <div class="container">
+        <div class="container text-center">
             &copy; 2023 - cinemanic - testing tmdb api
         </div>
     </footer>
+
+    <script>
+        var cartProductCount = 0;
+
+        $.ajax({
+            url: "/koszyk/liczba-produktow",
+            data: {},
+            type: "GET",
+            dataType: "json",
+            success: function (cartProducts) {
+                cartProductCount = cartProducts;
+                $('#cart-quantity').html('<span class="small-font align-bottom">' + cartProductCount + '</span>');
+            }
+        });
+    </script>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

@@ -24,8 +24,6 @@ namespace cinemanic.Data
                     Images = new List<string> { "https://image.tmdb.org/t/p/w500/" + movie.PosterPath },
                 };
 
-                Console.WriteLine("Stripe movie title: " + options.Name);
-
                 var service = new ProductService();
                 service.Create(options);
             }

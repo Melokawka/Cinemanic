@@ -1,7 +1,5 @@
-﻿using AutoMapper;
-using cinemanic.Models;
+﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
 using System.Text.Json;
 
 namespace cinemanic.Data
@@ -9,63 +7,57 @@ namespace cinemanic.Data
     public class MovieService
     {
         private readonly CinemanicDbContext _dbContext;
+        private readonly string _tmdbApiKey;
 
         private static HttpClient httpClient = new();
         private static JsonSerializerOptions jsonOptions = new();
 
-        private static int movieId;
-        private static string apiEndpoint2;
-        private static string apiEndpoint3;
-
-        private static Random random = new Random();
-
-        public MovieService(CinemanicDbContext dbContext)
+        public MovieService(CinemanicDbContext dbContext, IConfiguration configuration)
         {
             _dbContext = dbContext;
+            _tmdbApiKey = configuration["TmdbApiKey"];
         }
 
-        public static string FindTrailerKey(string json)
+        public async Task GetMovies()
         {
-            var jObject = JObject.Parse(json);
-            var jArray = (JArray)jObject["results"];
+            List<Movie> movies = new();
 
-            foreach (var item in jArray)
+            jsonOptions.Converters.Add(new MovieConverter());
+
+            //retrieve random movies from tmdb api
+            for (int i = 0; i < 5; i++)
             {
-                var type = (string)item["type"];
-                if (type == "Trailer")
-                {
-                    return (string)item["key"];
-                }
+                movies.Add(await GetMovie());
             }
 
-            return null;
-        }
+            var existingGenres = _dbContext.Genres.ToList();
 
-        private static async Task<int> GetRandomId()
-        {
-            HttpResponseMessage existsHttp;
-
-            do
+            foreach (Movie movie in movies)
             {
-                movieId = random.Next(10000, 100000);
+                movie.Genres = movie.Genres.Select(genre =>
+                {
+                    var existingGenre = existingGenres.FirstOrDefault(eg => eg.Id == genre.Id);
+                    return existingGenre ?? genre;
+                }).ToList();
 
-                apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=4446cb535a867cc6db4c689c8ebc7d97";
-                apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=4446cb535a867cc6db4c689c8ebc7d97";
+                _dbContext.Movies.Add(movie);
+            }
 
-                existsHttp = await httpClient.GetAsync(apiEndpoint2);
-
-            } while (!existsHttp.IsSuccessStatusCode);
-
-            return movieId;
+            await _dbContext.SaveChangesAsync();
         }
 
-        private static async Task<Movie> GetMovie(CinemanicDbContext dbContext)
+        private async Task<Movie> GetMovie()
         {
+            int movieId = await FindRandomMovieId();
+
+            string apiEndpoint2 = $"https://api.themoviedb.org/3/movie/{movieId}?api_key=" + _tmdbApiKey;
+            string apiEndpoint3 = $"https://api.themoviedb.org/3/movie/{movieId}/videos?api_key=" + _tmdbApiKey;
+
             var response = await httpClient.GetFromJsonAsync<Movie>(apiEndpoint2, jsonOptions);
 
             var json = await httpClient.GetStringAsync(apiEndpoint3);
 
-            var trailerLink = FindTrailerKey(json);
+            var trailerLink = MovieServiceFunctions.FindTrailerKey(json);
 
             response.Trailer = !String.IsNullOrEmpty(trailerLink) ? trailerLink : "";
 
@@ -74,46 +66,23 @@ namespace cinemanic.Data
             return response;
         }
 
-        public static async Task GetMovies(CinemanicDbContext dbContext)
+        private async Task<int> FindRandomMovieId()
         {
-            List<Genre> genres = new();
-            List<Movie> movies = new();
+            HttpResponseMessage existsHttp;
+            Random random = new();
+            int movieId;
 
-            jsonOptions.Converters.Add(new MovieConverter());
-
-            //retrieve random movies from tmdb api
-            for (int i = 0; i < 5; i++)
+            do
             {
-                await GetRandomId();
-                movies.Add(await GetMovie(dbContext));
-            }
+                movieId = random.Next(10000, 100000);
 
-            await using var transaction = await dbContext.Database.BeginTransactionAsync();
-            try
-            {
-                var existingGenres = dbContext.Genres.ToList();
+                existsHttp = await httpClient.GetAsync($"https://api.themoviedb.org/3/movie/{movieId}?api_key=" + _tmdbApiKey);
 
-                foreach (Movie movie in movies)
-                {
-                    movie.Genres = movie.Genres.Select(genre =>
-                    {
-                        var existingGenre = existingGenres.FirstOrDefault(eg => eg.Id == genre.Id);
-                        return existingGenre ?? genre;
-                    }).ToList();
+            } while (!existsHttp.IsSuccessStatusCode);
 
-                    dbContext.Movies.Add(movie);
-                }
-
-                await dbContext.SaveChangesAsync();
-                await transaction.CommitAsync();
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                await transaction.RollbackAsync();
-                throw;
-            }
+            return movieId;
         }
+
         public List<MovieInfo> GetMoviesInfo()
         {
             var movies = _dbContext.Movies
@@ -121,24 +90,7 @@ namespace cinemanic.Data
                 .Include(m => m.Screenings)
                 .ToList();
 
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Movie, MovieInfo>()
-                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()))
-                    .ForMember(dest => dest.Screenings, opt => opt.MapFrom(src => src.Screenings.Select(s => s).ToList()));
-
-                cfg.CreateMap<Genre, string>().ConvertUsing(g => g.GenreName);
-            });
-
-            IMapper mapper = config.CreateMapper();
-            var moviesInfo = mapper.Map<List<Movie>, List<MovieInfo>>(movies);
-
-            foreach (var movie in moviesInfo)
-            {
-                movie.Screenings = movie.Screenings.OrderBy(s => s.ScreeningDate).ToList();
-            }
-
-            return moviesInfo;
+            return MovieServiceFunctions.PrepareMoviesInfo(movies);
         }
     }
 }

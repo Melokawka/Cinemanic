@@ -54,6 +54,8 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TotalPrice,AccountId")] Order order)
         {
+            order.OrderStatus = OrderStatus.COMPLETED;
+
             _context.Add(order);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Admin));
@@ -84,6 +86,8 @@ namespace cinemanic.Controllers
             {
                 return NotFound();
             }
+
+            order.OrderStatus = OrderStatus.COMPLETED;
 
             _context.Update(order);
             await _context.SaveChangesAsync();

@@ -1,70 +1,41 @@
-﻿using AutoMapper;
-using cinemanic.Data;
+﻿using cinemanic.Data;
 using cinemanic.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 namespace cinemanic.Controllers
 {
     [Route("seanse")]
     public class ScreeningsController : Controller
     {
-        private readonly CinemanicDbContext _context;
+        private readonly CinemanicDbContext _dbContext;
 
         public ScreeningsController(CinemanicDbContext context)
         {
-            _context = context;
+            _dbContext = context;
         }
 
         [HttpGet("")]
         public async Task<IActionResult> Index(int? page)
         {
-            var movies = _context.Movies
+            var movies = _dbContext.Movies
                 .Include(m => m.Genres)
                 .Include(m => m.Screenings)
                 .ToList();
 
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Movie, MovieInfo>()
-                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()))
-                    .ForMember(dest => dest.Screenings, opt => opt.MapFrom(src => src.Screenings.Select(s => s).ToList()));
+            var moviesInfo = ScreeningFunctions.MapMoviesToMovieInfo(movies);
 
-                cfg.CreateMap<Genre, string>().ConvertUsing(g => g.GenreName);
-            });
+            ScreeningFunctions.SortScreeningsByDate(moviesInfo);
 
-            IMapper mapper = config.CreateMapper();
-            var moviesInfo = mapper.Map<List<Movie>, List<MovieInfo>>(movies);
+            var sortedDates = ScreeningFunctions.GetSortedUniqueDates(moviesInfo);
 
-            foreach (var movie in moviesInfo)
-            {
-                movie.Screenings = movie.Screenings.OrderBy(s => s.ScreeningDate).ToList();
-            }
+            int pageSize = 3; // dates per page
 
-            var uniqueDates = new List<string>();
+            var paginatedDates = ScreeningFunctions.GetPaginatedDates(sortedDates, page ?? 1, pageSize).ToList();
 
-            foreach (var movie in moviesInfo)
-            {
-                foreach (var screening in movie.Screenings)
-                {
-                    if (!uniqueDates.Contains(screening.ScreeningDate.Date.ToString("dd-MM-yyyy")))
-                    {
-                        uniqueDates.Add(screening.ScreeningDate.Date.ToString("dd-MM-yyyy"));
-                    }
-                }
-            }
-
-            var sortedDates = uniqueDates.OrderBy(date => DateTime.ParseExact(date, "dd-MM-yyyy", CultureInfo.InvariantCulture)).ToList();
-
-            int pageSize = 3; // Number of unique dates per page
-            int pageNumber = page ?? 1;
-
-            var paginatedDates = sortedDates.Skip((pageNumber - 1) * pageSize).Take(pageSize);
-
-            ViewBag.CurrentPage = pageNumber;
+            ViewBag.CurrentPage = page ?? 1;
             ViewBag.TotalPages = (int)Math.Ceiling((double)sortedDates.Count / pageSize);
 
             var filteredMovies = moviesInfo
@@ -72,61 +43,46 @@ namespace cinemanic.Controllers
                     .Any(screening => paginatedDates.Contains(screening.ScreeningDate.Date.ToString("dd-MM-yyyy"))))
                 .ToList();
 
-            var currentPaginatedDates = paginatedDates.ToList();
-
             var model = new ScreeningViewModel
             {
                 MoviesInfo = filteredMovies,
-                CurrentPaginatedDates = currentPaginatedDates
+                CurrentPaginatedDates = paginatedDates
             };
 
             return View(model);
+        }
+
+        [HttpGet("film/{id}")]
+        public async Task<IActionResult> Details(int? id)
+        {
+            var movie = await _dbContext.Movies
+                .Include(m => m.Genres)
+                .Include(m => m.Screenings)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            var movieInfo = ScreeningFunctions.MapMoviesToMovieInfo(new List<Movie> { movie });
+
+            ScreeningFunctions.SortScreeningsByDate(movieInfo);
+
+            return View(movieInfo[0]);
         }
 
         [Authorize(Roles = "Admin")]
         [HttpGet("admin")]
         public async Task<IActionResult> Admin()
         {
-            var cinemanicDbContext = _context.Screenings.Include(s => s.Movie).Include(s => s.Room);
+            var cinemanicDbContext = _dbContext.Screenings.Include(s => s.Movie).Include(s => s.Room);
             return View(await cinemanicDbContext.ToListAsync());
         }
 
-        [HttpGet("film/{id}")]
-        public async Task<IActionResult> Details(int? id)
-        {
-            var movie = await _context.Movies
-                .Include(m => m.Genres)
-                .Include(m => m.Screenings)
-                .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (movie == null)
-            {
-                return NotFound();
-            }
-
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.CreateMap<Movie, MovieInfo>()
-                    .ForMember(dest => dest.Genres, opt => opt.MapFrom(src => src.Genres.Select(g => g.GenreName).ToList()))
-                    .ForMember(dest => dest.Screenings, opt => opt.MapFrom(src => src.Screenings.Select(s => s).ToList()));
-
-                cfg.CreateMap<Genre, string>().ConvertUsing(g => g.GenreName);
-            });
-
-            IMapper mapper = config.CreateMapper();
-            var movieInfo = mapper.Map<Movie, MovieInfo>(movie);
-
-            movieInfo.Screenings = movieInfo.Screenings.OrderBy(s => s.ScreeningDate).ToList();
-
-            return View(movieInfo);
-        }
 
         [HttpGet("create")]
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id");
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id");
+            ViewData["MovieId"] = new SelectList(_dbContext.Movies, "Id", "Id");
+            ViewData["RoomId"] = new SelectList(_dbContext.Rooms, "Id", "Id");
             return View();
         }
 
@@ -135,8 +91,8 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ScreeningDate,Subtitles,Lector,Dubbing,Is3D,SeatsLeft,RoomId,MovieId")] Screening screening)
         {
-            _context.Add(screening);
-            await _context.SaveChangesAsync();
+            _dbContext.Add(screening);
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Admin));
         }
@@ -145,18 +101,18 @@ namespace cinemanic.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Screenings == null)
+            if (id == null || _dbContext.Screenings == null)
             {
                 return NotFound();
             }
 
-            var screening = await _context.Screenings.FindAsync(id);
+            var screening = await _dbContext.Screenings.FindAsync(id);
             if (screening == null)
             {
                 return NotFound();
             }
-            ViewData["MovieId"] = new SelectList(_context.Movies, "Id", "Id", screening.MovieId);
-            ViewData["RoomId"] = new SelectList(_context.Rooms, "Id", "Id", screening.RoomId);
+            ViewData["MovieId"] = new SelectList(_dbContext.Movies, "Id", "Id", screening.MovieId);
+            ViewData["RoomId"] = new SelectList(_dbContext.Rooms, "Id", "Id", screening.RoomId);
             return View(screening);
         }
 
@@ -170,8 +126,8 @@ namespace cinemanic.Controllers
                 return NotFound();
             }
 
-            _context.Update(screening);
-            await _context.SaveChangesAsync();
+            _dbContext.Update(screening);
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Admin));
         }
@@ -180,12 +136,12 @@ namespace cinemanic.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Screenings == null)
+            if (id == null || _dbContext.Screenings == null)
             {
                 return NotFound();
             }
 
-            var screening = await _context.Screenings
+            var screening = await _dbContext.Screenings
                 .Include(s => s.Movie)
                 .Include(s => s.Room)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -202,23 +158,23 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Screenings == null)
+            if (_dbContext.Screenings == null)
             {
                 return Problem("Entity set 'CinemanicDbContext.Screenings'  is null.");
             }
-            var screening = await _context.Screenings.FindAsync(id);
+            var screening = await _dbContext.Screenings.FindAsync(id);
             if (screening != null)
             {
-                _context.Screenings.Remove(screening);
+                _dbContext.Screenings.Remove(screening);
             }
 
-            await _context.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Admin));
         }
 
         private bool ScreeningExists(int id)
         {
-            return (_context.Screenings?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_dbContext.Screenings?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

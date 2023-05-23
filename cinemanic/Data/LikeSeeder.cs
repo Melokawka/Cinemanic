@@ -1,5 +1,4 @@
-﻿using Bogus;
-using cinemanic.Models;
+﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace cinemanic.Data
@@ -10,7 +9,6 @@ namespace cinemanic.Data
         {
             var random = new Random();
 
-            // retrieve all the account IDs using LINQ
             List<int> accountIds = await dbContext.Accounts.Select(a => a.Id).ToListAsync();
             List<int> movieIds = await dbContext.Movies.Select(a => a.Id).ToListAsync();
 

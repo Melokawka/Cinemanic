@@ -20,6 +20,13 @@ namespace cinemanic.Controllers
         }
 
         [HttpGet]
+        [Route("maksimum-paginacji-postow")]
+        public async Task<int> GetMaxPage()
+        {
+            return await _postService.GetMaxPageFromResponse(3);
+        }
+
+        [HttpGet]
         [Route("posty-json")]
         public async Task<string> GetPostsJsonAsync(string apiEndpoint)
         {
@@ -29,14 +36,14 @@ namespace cinemanic.Controllers
         [HttpGet("pobierz-posty")]
         public async Task<List<Post>> GetPosts(int page)
         {
-            return await _postService.GetPosts(page);
+            return await _postService.GetPosts(page, 3);
         }
 
         [Route("")]
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            var posts = await _postService.GetPosts(1);
+            var posts = await _postService.GetPosts(1, 3);
 
             var movies = _movieService.GetMoviesInfo();
 

@@ -71,11 +71,6 @@ namespace cinemanic.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
-            if (user == null)
-            {
-                return NotFound();
-            }
-
             var birthDate = new DateTimeOffset(user.BirthDate);
             var tickets = _dbContext.Tickets
                 .Include(at => at.Screening)
@@ -148,12 +143,11 @@ namespace cinemanic.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    var identity = new ClaimsIdentity(IdentityConstants.ApplicationScheme);
-                    identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                    identity.AddClaim(new Claim(ClaimTypes.Name, user.UserName));
-                    identity.AddClaim(new Claim(ClaimTypes.Email, user.Email));
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.DateOfBirth, user.BirthDate.ToString("o")),
+                    };
 
-                    var principal = new ClaimsPrincipal(identity);
                     var authProperties = new AuthenticationProperties
                     {
                         IsPersistent = false
@@ -168,17 +162,11 @@ namespace cinemanic.Controllers
                     _dbContext.Accounts.Add(userAccount);
                     await _dbContext.SaveChangesAsync();
 
-                    await HttpContext.SignInAsync(IdentityConstants.ApplicationScheme, principal, authProperties);
-                    //await _signInManager.SignInWithClaimsAsync(user, authProperties, claims);
+                    await _signInManager.SignInWithClaimsAsync(user, authProperties, claims);
 
                     return RedirectToAction("Index", "Home");
                 }
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
             }
-
             return View(model);
         }
     }

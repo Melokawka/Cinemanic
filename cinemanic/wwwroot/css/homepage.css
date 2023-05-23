@@ -23,11 +23,22 @@
 
 .screeningDatesList {
     list-style: none;
-    padding-inline-start: 0px
+    padding-inline-start: 0px;
+    text-align: right !important;
 }
 
 .moviePoster {
-    width: 100%;
-    height: 100%;
+    width: 10rem;
+    height: 15rem;
     object-fit: cover;
+}
+
+.restrict-length {
+    height: 150px !important;
+    overflow: hidden;
+}
+
+.account-pics {
+    height: 10rem;
+    width: 8rem;
 }
