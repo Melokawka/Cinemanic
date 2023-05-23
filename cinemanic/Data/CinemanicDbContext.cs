@@ -12,6 +12,7 @@ namespace cinemanic.Data
         public DbSet<Order> Orders { get; set; }
         public DbSet<Room> Rooms { get; set; }
         public DbSet<Screening> Screenings { get; set; }
+        public DbSet<ArchivedScreening> ArchivedScreenings { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<ArchivedTicket> ArchivedTickets { get; set; }
         public DbSet<Genre> Genres { get; set; }

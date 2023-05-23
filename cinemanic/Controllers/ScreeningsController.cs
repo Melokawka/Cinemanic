@@ -75,7 +75,13 @@ namespace cinemanic.Controllers
             return View(await cinemanicDbContext.ToListAsync());
         }
 
-
+        [Authorize(Roles = "Admin")]
+        [HttpGet("admin/archiwum")]
+        public async Task<IActionResult> AdminArchive()
+        {
+            var cinemanicDbContext = _dbContext.ArchivedScreenings.Include(s => s.Movie);
+            return View(await cinemanicDbContext.ToListAsync());
+        }
 
         [HttpGet("create")]
         [Authorize(Roles = "Admin")]

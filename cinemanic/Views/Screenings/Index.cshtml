@@ -5,78 +5,78 @@
 }
 
 <h1>Seanse</h1>
-
-@foreach (var currentPaginatedDate in @Model.CurrentPaginatedDates)
-{
+@{
     int movieNr = 1;
-
-    <div class="mb-5">
-        <h2>@currentPaginatedDate</h2>
+    @foreach (var currentPaginatedDate in @Model.CurrentPaginatedDates)
+    {
+        <div class="mb-5">
+            <h2>@currentPaginatedDate</h2>
         
-        @foreach (var movie in Model.MoviesInfo)
-        {
-            if (movie.Screenings.Any(s => s.ScreeningDate.ToString("dd-MM-yyyy") == currentPaginatedDate))
+            @foreach (var movie in Model.MoviesInfo)
             {
-                <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><h2 class="mt-4">@movie.Title</h2></a>
-                <div class="row justify-content-between">
-                    <div class="col-md-2">
-                        <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><img src="https://image.tmdb.org/t/p/w200/@movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="moviePoster"></a>
-                    </div>
-                    <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
-                        <h4>Bilet</h4>
-                        <ul class="screeningDatesList">
-                            @foreach (var screening in movie.Screenings)
-                            {
-                                @if (@screening.ScreeningDate.ToString("dd-MM-yyyy") == currentPaginatedDate)
+                if (movie.Screenings.Any(s => s.ScreeningDate.ToString("dd-MM-yyyy") == currentPaginatedDate))
+                {
+                    <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><h2 class="mt-4">@movie.Title</h2></a>
+                    <div class="row justify-content-between">
+                        <div class="col-md-2">
+                            <a asp-controller="Screenings" asp-action="Details" asp-route-id="@movie.Id"><img src="https://image.tmdb.org/t/p/w200/@movie.PosterPath" onerror="this.src='/placeholders/placeholder.jpg';" class="moviePoster"></a>
+                        </div>
+                        <div class="col-md-2 d-flex justify-content-center flex-column align-items-end">
+                            <h4>Bilet</h4>
+                            <ul class="screeningDatesList">
+                                @foreach (var screening in movie.Screenings)
                                 {
-                                    @if (screening.Subtitles)
+                                    @if (@screening.ScreeningDate.ToString("dd-MM-yyyy") == currentPaginatedDate)
                                     {
-                                        <li>Z napisami</li>
+                                        @if (screening.Subtitles)
+                                        {
+                                            <li>Z napisami</li>
+                                        }
+                                        @if (screening.Lector)
+                                        {
+                                            <li>Z lektorem</li>
+                                        }
+                                        @if (screening.Dubbing)
+                                        {
+                                            <li>Z dubbingiem</li>
+                                        }
+                                        @if (screening.Dubbing)
+                                        {
+                                            <li>3D</li>
+                                        }
+                                        <li>
+                                            <a href="@Url.Action("Buy", "Tickets", new { screeningId = screening.Id, movieId = movie.Id })" class="btn btn-secondary mt-1" >
+                                                @screening.ScreeningDate.ToString("HH:mm")
+                                            </a>
+                                        </li>
                                     }
-                                    @if (screening.Lector)
-                                    {
-                                        <li>Z lektorem</li>
-                                    }
-                                    @if (screening.Dubbing)
-                                    {
-                                        <li>Z dubbingiem</li>
-                                    }
-                                    @if (screening.Dubbing)
-                                    {
-                                        <li>3D</li>
-                                    }
-                                    <li>
-                                        <a asp-controller="Tickets" asp-action="Buy" asp-route-screeningId="@screening.Id" asp-route-movieId="@movie.Id">
-                                            @screening.ScreeningDate.ToString("HH:mm")
-                                        </a>
-                                    </li>
                                 }
-                            }
-                        </ul>
+                            </ul>
+                        </div>
                     </div>
-                </div>
-            <div class="accordion mt-3" id="movieDesc@(movieNr)Accordion">
-                <div class="card">
-                    <div class="card-header" id="movieDesc@(movieNr)Header">
-                        <h3 class="mb-0">
-                            <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#movieDesc@(movieNr)Collapse" aria-expanded="false" aria-controls="movieDesc@(movieNr)Collapse">
-                                Informacje:
-                            </button>
-                        </h3>
-                    </div>
-                    <div id="movieDesc@(movieNr)Collapse" class="collapse" aria-labelledby="movieDesc@(movieNr)Header" data-parent="#movieDesc@(movieNr)Accordion">
-                        <div class="card-body">
-                            <p>Czas trwania: @movie.Duration minut</p>
-                            <p>Kategorie: @string.Join(", ", movie.Genres)</p>
-                            <p>Dla dorosłych: @(movie.Adult ? "Tak" : "Nie")</p>
+                <div class="accordion mt-3" id="movieDesc@(movieNr)Accordion">
+                    <div class="card">
+                        <div class="card-header" id="movieDesc@(movieNr)Header">
+                            <h3 class="mb-0">
+                                <button class="btn btn-link" type="button" data-toggle="collapse" data-target="#movieDesc@(movieNr)Collapse" aria-expanded="false" aria-controls="movieDesc@(movieNr)Collapse">
+                                    Informacje:
+                                </button>
+                            </h3>
+                        </div>
+                        <div id="movieDesc@(movieNr)Collapse" class="collapse" aria-labelledby="movieDesc@(movieNr)Header" data-parent="#movieDesc@(movieNr)Accordion">
+                            <div class="card-body">
+                                <p>Czas trwania: @movie.Duration minut</p>
+                                <p>Kategorie: @string.Join(", ", movie.Genres)</p>
+                                <p>Dla dorosłych: @(movie.Adult ? "Tak" : "Nie")</p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            movieNr++;
+                movieNr++;
+                }
             }
-        }
-    </div>
+        </div>
+    }
 }
 
 @if (ViewBag.TotalPages > 1)

@@ -69,7 +69,6 @@ namespace cinemanic.Data
                 return int.Parse(maxPage);
             }
 
-            // The response is an empty array or an unexpected format, default to 1 page
             return 1;
         }
     }

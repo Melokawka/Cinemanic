@@ -71,6 +71,8 @@ namespace cinemanic.Controllers
         {
             var user = await _userManager.GetUserAsync(User);
 
+            Console.WriteLine(user.BirthDate);
+
             var birthDate = new DateTimeOffset(user.BirthDate);
             var tickets = _dbContext.Tickets
                 .Include(at => at.Screening)
@@ -139,7 +141,7 @@ namespace cinemanic.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, BirthDate = model.DateOfBirth };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {

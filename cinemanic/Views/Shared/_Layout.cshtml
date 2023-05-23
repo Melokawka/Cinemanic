@@ -40,7 +40,7 @@
     <header>
         <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">cinemanic</a>
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Cinemanic</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
@@ -62,6 +62,9 @@
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Screenings" asp-action="Admin">Seanse</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-controller="Screenings" asp-action="AdminArchive">Archiwum</a>
                             </li>
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-controller="Tickets" asp-action="Admin">Bilety</a>
@@ -113,7 +116,7 @@
 
     <footer class="border-top footer text-muted">
         <div class="container text-center">
-            &copy; 2023 - cinemanic - testing tmdb api
+            &copy; 2023 - Cinemanic - testing TMDB API
         </div>
     </footer>
 

@@ -11,12 +11,12 @@ namespace cinemanic.Controllers
     [Route("bilety")]
     public class TicketsController : Controller
     {
-        private readonly CinemanicDbContext _context;
+        private readonly CinemanicDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public TicketsController(CinemanicDbContext context, UserManager<ApplicationUser> userManager)
         {
-            _context = context;
+            _dbContext = context;
             _userManager = userManager;
         }
 
@@ -24,7 +24,7 @@ namespace cinemanic.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Admin()
         {
-            var cinemanicDbContext = _context.Tickets.Include(t => t.Order).Include(t => t.Screening);
+            var cinemanicDbContext = _dbContext.Tickets.Include(t => t.Order).Include(t => t.Screening);
             return View(await cinemanicDbContext.ToListAsync());
         }
 
@@ -32,12 +32,12 @@ namespace cinemanic.Controllers
         [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Tickets == null)
+            if (id == null || _dbContext.Tickets == null)
             {
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            var ticket = await _dbContext.Tickets
                 .Include(t => t.Order)
                 .Include(t => t.Screening)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -55,11 +55,11 @@ namespace cinemanic.Controllers
         {
             var pricingTypes = Enum.GetValues(typeof(PricingType)).Cast<PricingType>();
 
-            var maxOrderId = _context.Orders.Max(o => o.Id);
+            var maxOrderId = _dbContext.Orders.Max(o => o.Id);
             var nextOrderId = maxOrderId + 1;
 
-            var movie = await _context.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
-            var screening = await _context.Screenings.FirstOrDefaultAsync(s => s.Id == screeningId);
+            var movie = await _dbContext.Movies.FirstOrDefaultAsync(m => m.Id == movieId);
+            var screening = await _dbContext.Screenings.FirstOrDefaultAsync(s => s.Id == screeningId);
 
             var freeSeats = await GetFreeSeatsList(screeningId);
 
@@ -81,8 +81,8 @@ namespace cinemanic.Controllers
 
         public async Task<List<int>> GetFreeSeatsList(int screeningId)
         {
-            var seatsTaken = await _context.Tickets.Where(t => t.ScreeningId == screeningId && t.IsActive).Select(t => t.Seat).ToListAsync();
-            var seatsCount = await _context.Screenings.Where(s => s.Id == screeningId).Select(s => s.Room.Seats).FirstOrDefaultAsync();
+            var seatsTaken = await _dbContext.Tickets.Where(t => t.ScreeningId == screeningId && t.IsActive).Select(t => t.Seat).ToListAsync();
+            var seatsCount = await _dbContext.Screenings.Where(s => s.Id == screeningId).Select(s => s.Room.Seats).FirstOrDefaultAsync();
 
             List<int> freeSeats = Enumerable.Range(1, seatsCount).ToList()
                 .Except(seatsTaken).ToList();
@@ -103,7 +103,7 @@ namespace cinemanic.Controllers
             ticket.TicketPrice = (decimal)await CalculatePrice(ticket.ScreeningId, ticket.Seat);
 
             var ticketPrice = hasDiscount ? (ticket.TicketPrice / 2) : ticket.TicketPrice;
-            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
 
             Ticket newTicket = new Ticket
             {
@@ -114,7 +114,7 @@ namespace cinemanic.Controllers
                 ScreeningId = ticket.ScreeningId
             };
 
-            Order activeOrder = await _context.Orders
+            Order activeOrder = await _dbContext.Orders
                 .FirstOrDefaultAsync(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
 
             if (activeOrder == null)
@@ -130,8 +130,8 @@ namespace cinemanic.Controllers
 
             else AssignTicketToOrder(newTicket, activeOrder);
 
-            _context.Add(newTicket);
-            await _context.SaveChangesAsync();
+            _dbContext.Add(newTicket);
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction("Index", "Screenings");
         }
@@ -147,7 +147,7 @@ namespace cinemanic.Controllers
         {
             var ticketPrice = 12.0 + (seat * 0.1);
 
-            var screening = await _context.Screenings.Where(s => s.Id == screeningId)
+            var screening = await _dbContext.Screenings.Where(s => s.Id == screeningId)
                 .Include(s => s.Movie)
                 .FirstOrDefaultAsync();
 
@@ -170,17 +170,24 @@ namespace cinemanic.Controllers
         public async Task<IActionResult> RemoveTicket(int id)
         {
             var user = await _userManager.GetUserAsync(User);
-            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
+            var account = await _dbContext.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email);
 
-            var ticket = await _context.Tickets.FindAsync(id);
-            var isUsersTicket = await _context.Orders.AnyAsync(o => o.AccountId == account.Id && o.Id == ticket.OrderId);
+            var ticket = await _dbContext.Tickets
+                .Include(t => t.Order)
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            var isUsersTicket = await _dbContext.Orders.AnyAsync(o => o.AccountId == account.Id && o.Id == ticket.OrderId && !ticket.IsActive);
 
             if (ticket != null && isUsersTicket)
             {
-                _context.Tickets.Remove(ticket);
+                _dbContext.Tickets.Remove(ticket);
+
+                var orderWithoutTicket = ticket.Order;
+                orderWithoutTicket.TotalPrice -= ticket.TicketPrice;
+                _dbContext.Orders.Update(orderWithoutTicket);
             }
 
-            await _context.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return RedirectToAction("Index", "ShoppingCart");
         }
 
@@ -191,8 +198,8 @@ namespace cinemanic.Controllers
             var pricingTypes = Enum.GetValues(typeof(PricingType)).Cast<PricingType>();
             ViewBag.PricingTypes = new SelectList(pricingTypes);
 
-            ViewData["OrderId"] = new SelectList(_context.Orders, "Id", "Id");
-            ViewData["ScreeningId"] = new SelectList(_context.Screenings, "Id", "Id");
+            ViewData["OrderId"] = new SelectList(_dbContext.Orders, "Id", "Id");
+            ViewData["ScreeningId"] = new SelectList(_dbContext.Screenings, "Id", "Id");
             return View();
         }
 
@@ -201,8 +208,8 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Seat,PricingType,TicketPrice,ScreeningId,OrderId,IsActive")] Ticket ticket)
         {
-            _context.Add(ticket);
-            await _context.SaveChangesAsync();
+            _dbContext.Add(ticket);
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Admin));
         }
@@ -211,12 +218,12 @@ namespace cinemanic.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Tickets == null)
+            if (id == null || _dbContext.Tickets == null)
             {
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticket = await _dbContext.Tickets.FindAsync(id);
             if (ticket == null)
             {
                 return NotFound();
@@ -225,8 +232,8 @@ namespace cinemanic.Controllers
             var pricingTypes = Enum.GetValues(typeof(PricingType)).Cast<PricingType>();
             ViewBag.PricingTypes = new SelectList(pricingTypes);
 
-            ViewData["OrderId"] = new SelectList(_context.Orders, "Id", "Id", ticket.OrderId);
-            ViewData["ScreeningId"] = new SelectList(_context.Screenings, "Id", "Id", ticket.ScreeningId);
+            ViewData["OrderId"] = new SelectList(_dbContext.Orders, "Id", "Id", ticket.OrderId);
+            ViewData["ScreeningId"] = new SelectList(_dbContext.Screenings, "Id", "Id", ticket.ScreeningId);
             return View(ticket);
         }
 
@@ -240,8 +247,8 @@ namespace cinemanic.Controllers
                 return NotFound();
             }
 
-            _context.Update(ticket);
-            await _context.SaveChangesAsync();
+            _dbContext.Update(ticket);
+            await _dbContext.SaveChangesAsync();
 
             return RedirectToAction(nameof(Details), new { id = id });
         }
@@ -250,12 +257,12 @@ namespace cinemanic.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null || _context.Tickets == null)
+            if (id == null || _dbContext.Tickets == null)
             {
                 return NotFound();
             }
 
-            var ticket = await _context.Tickets
+            var ticket = await _dbContext.Tickets
                 .Include(t => t.Order)
                 .Include(t => t.Screening)
                 .FirstOrDefaultAsync(m => m.Id == id);
@@ -272,23 +279,23 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            if (_context.Tickets == null)
+            if (_dbContext.Tickets == null)
             {
                 return Problem("Entity set 'CinemanicDbContext.Tickets'  is null.");
             }
-            var ticket = await _context.Tickets.FindAsync(id);
+            var ticket = await _dbContext.Tickets.FindAsync(id);
             if (ticket != null)
             {
-                _context.Tickets.Remove(ticket);
+                _dbContext.Tickets.Remove(ticket);
             }
 
-            await _context.SaveChangesAsync();
+            await _dbContext.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool TicketExists(int id)
         {
-            return (_context.Tickets?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_dbContext.Tickets?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

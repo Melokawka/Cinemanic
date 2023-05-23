@@ -1,0 +1,77 @@
+﻿@model IEnumerable<cinemanic.Models.ArchivedScreening>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.ScreeningDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Subtitles)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lector)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Dubbing)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Is3D)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.SeatsLeft)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RoomId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Movie)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.GrossIncome)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model) {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ScreeningDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Subtitles)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lector)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Dubbing)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Is3D)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SeatsLeft)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RoomId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Movie.Id)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.GrossIncome)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

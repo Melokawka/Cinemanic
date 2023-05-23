@@ -95,12 +95,14 @@ namespace cinemanic.Data
 
             var response = await client.SendAsync(request);
             var responseContent = await response.Content.ReadAsStringAsync();
-            //Console.WriteLine(responseContent);
         }
 
         public async Task<List<Post>> GetPostsAsync(string apiEndpoint)
         {
-            HttpResponseMessage response = await _httpClient.GetAsync(apiEndpoint);
+            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiEndpoint);
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", _wordpressApiKey);
+
+            HttpResponseMessage response = await _httpClient.SendAsync(request);
 
             string jsonResponse = await response.Content.ReadAsStringAsync();
 

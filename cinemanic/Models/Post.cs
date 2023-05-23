@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System.ComponentModel;
 
 namespace cinemanic.Models
 {
@@ -10,6 +11,7 @@ namespace cinemanic.Models
         public RenderedProperty Content { get; set; }
 
         [JsonProperty("featured_media")]
+        [DefaultValue("/placeholders/placeholder.jpg")]
         public string? FeaturedMediaUrl { get; set; }
         public string Link { get; set; }
     }

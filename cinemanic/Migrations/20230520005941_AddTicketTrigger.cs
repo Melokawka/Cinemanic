@@ -319,12 +319,6 @@ namespace cinemanic.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ArchivedTickets", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ArchivedTickets_Screenings_ScreeningId",
-                        column: x => x.ScreeningId,
-                        principalTable: "Screenings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(

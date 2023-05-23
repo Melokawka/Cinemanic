@@ -7,28 +7,31 @@ namespace cinemanic.Data
     {
         public static async Task SeedTickets(CinemanicDbContext dbContext)
         {
+            var screeningIds = await TicketSeederFunctions.GetScreeningIds(dbContext);
+            var accountIds = await TicketSeederFunctions.GetAccountIds(dbContext);
+            var orderIds = await TicketSeederFunctions.GetOrderIds(dbContext);
+
+            var tickets = await GenerateRandomTickets(screeningIds, orderIds, dbContext);
+            await TicketSeederFunctions.SaveTickets(dbContext, tickets);
+
+            await ClearPendingOrders(dbContext, accountIds);
+            await CreatePendingOrders(dbContext, accountIds);
+            tickets = await GenerateFutureTickets(dbContext, accountIds);
+
+            await TicketSeederFunctions.SaveTickets(dbContext, tickets);
+        }
+
+        private async static Task<List<Ticket>> GenerateRandomTickets(List<int> screeningIds, List<int> orderIds, CinemanicDbContext dbContext)
+        {
             var random = new Random();
-
-            List<int> screeningIds = await dbContext.Screenings.Select(a => a.Id).ToListAsync();
-
-            List<int> accountIds = await dbContext.Accounts.Select(a => a.Id).ToListAsync();
-
-            List<int> orderIds = await dbContext.Orders.Select(a => a.Id).ToListAsync();
-
-            List<Ticket> tickets = new();
+            var tickets = new List<Ticket>();
 
             for (int i = 0; i < random.Next(40, 50); i++)
             {
                 int randomScreeningId = screeningIds[random.Next(screeningIds.Count)];
-
-                int roomId = await dbContext.Screenings.Where(s => s.Id == randomScreeningId).Select(s => s.RoomId).FirstOrDefaultAsync();
-                int seats = await dbContext.Rooms.Where(r => r.Id == roomId).Select(r => r.Seats).FirstOrDefaultAsync();
-
-                int randomSeat = random.Next(1, seats + 1);
-                while (dbContext.Tickets.Local.Any(t => t.ScreeningId == randomScreeningId && t.Seat == randomSeat))
-                {
-                    randomSeat = random.Next(1, seats + 1);
-                }
+                int roomId = await TicketSeederFunctions.GetRoomIdForScreening(dbContext, randomScreeningId);
+                int seats = await TicketSeederFunctions.GetSeatsForRoom(dbContext, roomId);
+                int randomSeat = GenerateUniqueRandomSeat(dbContext, randomScreeningId, seats);
 
                 var randomPricingType = Convert.ToBoolean(random.Next(2)) ? PricingType.NORMALNY : PricingType.ULGOWY;
 
@@ -36,7 +39,7 @@ namespace cinemanic.Data
                 {
                     Seat = randomSeat,
                     PricingType = randomPricingType,
-                    TicketPrice = (randomPricingType == PricingType.ULGOWY) ? (decimal)(random.Next(1100, 2300) * 0.01 * 0.5) : (decimal)(random.Next(1100, 2300) * 0.01),
+                    TicketPrice = CalculateTicketPrice(randomPricingType),
                     IsActive = true,
                     ScreeningId = randomScreeningId,
                     OrderId = orderIds[random.Next(orderIds.Count)],
@@ -44,42 +47,74 @@ namespace cinemanic.Data
                 tickets.Add(ticket);
             }
 
-            await dbContext.Tickets.AddRangeAsync(tickets);
-            await dbContext.SaveChangesAsync();
-            tickets.Clear();
+            return tickets;
+        }
 
+        private static int GenerateUniqueRandomSeat(CinemanicDbContext dbContext, int screeningId, int seats)
+        {
+            var random = new Random();
+            int randomSeat = random.Next(1, seats + 1);
+
+            while (dbContext.Tickets.Local.Any(t => t.ScreeningId == screeningId && t.Seat == randomSeat))
+            {
+                randomSeat = random.Next(1, seats + 1);
+            }
+
+            return randomSeat;
+        }
+
+        private static decimal CalculateTicketPrice(PricingType pricingType)
+        {
+            var random = new Random();
+            var basePrice = random.Next(1100, 2300) * 0.01;
+
+            if (pricingType == PricingType.ULGOWY)
+            {
+                return (decimal)(basePrice * 0.5);
+            }
+            else
+            {
+                return (decimal)basePrice;
+            }
+        }
+
+        private static async Task ClearPendingOrders(CinemanicDbContext dbContext, List<int> accountIds)
+        {
             if (dbContext.Orders.Count(o => o.OrderStatus == OrderStatus.PENDING) < accountIds.Count)
             {
                 var pendingOrders = dbContext.Orders.Where(o => o.OrderStatus == OrderStatus.PENDING);
                 dbContext.Orders.RemoveRange(pendingOrders);
                 await dbContext.SaveChangesAsync();
+            }
+        }
 
-                foreach (var account in accountIds)
-                {
-                    var order = new Order { AccountId = account, TotalPrice = 0, OrderStatus = OrderStatus.PENDING };
-                    dbContext.Orders.Add(order);
-                }
+        private static async Task CreatePendingOrders(CinemanicDbContext dbContext, List<int> accountIds)
+        {
+            foreach (var account in accountIds)
+            {
+                var order = new Order { AccountId = account, TotalPrice = 0, OrderStatus = OrderStatus.PENDING };
+                dbContext.Orders.Add(order);
             }
 
             await dbContext.SaveChangesAsync();
+        }
+
+        private static async Task<List<Ticket>> GenerateFutureTickets(CinemanicDbContext dbContext, List<int> accountIds)
+        {
+            var random = new Random();
+            var tickets = new List<Ticket>();
 
             foreach (var account in accountIds)
             {
                 var order = await dbContext.Orders.SingleAsync(o => o.AccountId == account && o.OrderStatus == OrderStatus.PENDING);
-
-                List<int> futureScreeningIds = await dbContext.Screenings.Where(s => s.ScreeningDate > DateTime.Now).Select(s => s.Id).ToListAsync();
+                var futureScreeningIds = await TicketSeederFunctions.GetFutureScreeningIds(dbContext);
 
                 for (var i = 0; i < 2; i++)
                 {
                     int randomScreeningId = futureScreeningIds[random.Next(futureScreeningIds.Count)];
-                    int roomId = await dbContext.Screenings.Where(s => s.Id == randomScreeningId).Select(s => s.RoomId).FirstOrDefaultAsync();
-                    int seats = await dbContext.Rooms.Where(r => r.Id == roomId).Select(r => r.Seats).FirstOrDefaultAsync();
-
-                    int randomSeat = random.Next(1, seats + 1);
-                    while (dbContext.Tickets.Local.Any(t => t.ScreeningId == randomScreeningId && t.Seat == randomSeat))
-                    {
-                        randomSeat = random.Next(1, seats + 1);
-                    }
+                    int roomId = await TicketSeederFunctions.GetRoomIdForScreening(dbContext, randomScreeningId);
+                    int seats = await TicketSeederFunctions.GetSeatsForRoom(dbContext, roomId);
+                    int randomSeat = GenerateUniqueRandomSeat(dbContext, randomScreeningId, seats);
 
                     var randomPricingType = Convert.ToBoolean(random.Next(2)) ? PricingType.NORMALNY : PricingType.ULGOWY;
 
@@ -87,7 +122,7 @@ namespace cinemanic.Data
                     {
                         Seat = randomSeat,
                         PricingType = randomPricingType,
-                        TicketPrice = (randomPricingType == PricingType.ULGOWY) ? (decimal)(random.Next(1100, 2300) * 0.01 * 0.5) : (decimal)(random.Next(1100, 2300) * 0.01),
+                        TicketPrice = CalculateTicketPrice(randomPricingType),
                         IsActive = false,
                         ScreeningId = randomScreeningId,
                         OrderId = order.Id,
@@ -96,8 +131,8 @@ namespace cinemanic.Data
                     tickets.Add(ticket);
                 }
             }
-            await dbContext.Tickets.AddRangeAsync(tickets);
-            await dbContext.SaveChangesAsync();
+
+            return tickets;
         }
     }
 }

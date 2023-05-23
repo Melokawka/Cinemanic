@@ -42,3 +42,11 @@
     height: 10rem;
     width: 8rem;
 }
+
+a {
+    text-decoration: none !important;
+}
+
+.btn-link {
+    text-decoration: none !important;
+}

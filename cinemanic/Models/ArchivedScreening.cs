@@ -1,6 +1,6 @@
 ﻿namespace cinemanic.Models
 {
-    public class Screening
+    public class ArchivedScreening
     {
         public int Id { get; set; }
         public DateTime ScreeningDate { get; set; }
@@ -9,11 +9,9 @@
         public bool Dubbing { get; set; }
         public bool Is3D { get; set; }
         public int SeatsLeft { get; set; }
-
-        public Room Room { get; set; } = null!;
         public int RoomId { get; set; }
         public Movie Movie { get; set; } = null!;
         public int MovieId { get; set; }
-        public List<Ticket> Tickets { get; set; } = new();
+        public decimal GrossIncome { get; set; }
     }
 }

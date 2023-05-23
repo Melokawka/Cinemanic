@@ -19,6 +19,13 @@ namespace cinemanic.Seeders
                 if (result.Succeeded)
                 {
                     await userManager.AddToRoleAsync(adminUser, ApplicationRole.Admin);
+
+                    var adminAccount = new Account
+                    {
+                        UserEmail = adminUser.Email,
+                        Birthdate = adminUser.BirthDate,
+                    };
+                    dbContext.Accounts.Add(adminAccount);
                 }
             }
 
@@ -31,16 +38,10 @@ namespace cinemanic.Seeders
                 {
                     var user = new ApplicationUser { Email = userEmail, UserName = userEmail, BirthDate = GenerateRandomBirthdate() };
                     var result = await userManager.CreateAsync(user, userPassword);
-                    Console.WriteLine(user.Email.ToString());
-                    Console.WriteLine(user.UserName.ToString());
-                    Console.WriteLine(user.BirthDate.ToString());
-                    Console.WriteLine(result.Succeeded);
 
                     if (result.Succeeded)
                     {
                         await userManager.AddToRoleAsync(user, ApplicationRole.User);
-                        Console.WriteLine(user.Id.ToString());
-                        Console.WriteLine(user.PasswordHash.ToString());
 
                         var userAccount = new Account
                         {
@@ -48,8 +49,6 @@ namespace cinemanic.Seeders
                             Birthdate = user.BirthDate,
                         };
                         dbContext.Accounts.Add(userAccount);
-
-                        Console.WriteLine(userAccount.ToString());
                     }
                 }
             }

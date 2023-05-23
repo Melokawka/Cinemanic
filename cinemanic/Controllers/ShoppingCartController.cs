@@ -59,7 +59,7 @@ namespace cinemanic.Controllers
                         .ThenInclude(s => s.Movie)
                 .FirstOrDefault(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.SUBMITTED && o.Id == orderId);
 
-            if (!ShoppingCartFunctions.CanPurchaseAdultContent(userAge, order)) return Content("Osoba niepełnoletnia nie może kupić biletu na seans dla dorosłych", "text/html");
+            if (!ShoppingCartFunctions.CanPurchaseAdultContent(userAge, order)) return Content("Osoba niepelnoletnia nie moze kupic biletu na seans dla doroslych", "text/html");
 
             return await ProcessOrder(order);
         }
@@ -78,7 +78,7 @@ namespace cinemanic.Controllers
                         .ThenInclude(s => s.Movie)
                 .FirstOrDefault(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
 
-            if (!ShoppingCartFunctions.CanPurchaseAdultContent(userAge, order)) return Content("Osoba niepełnoletnia nie może kupić biletu na seans dla dorosłych", "text/html");
+            if (!ShoppingCartFunctions.CanPurchaseAdultContent(userAge, order)) return Content("Osoba niepelnoletnia nie moze kupic biletu na seans dla doroslych", "text/html");
 
             order.OrderStatus = OrderStatus.SUBMITTED;
             _dbContext.Update(order);
@@ -92,9 +92,11 @@ namespace cinemanic.Controllers
         public async Task<int> CountProductsInCart()
         {
             var user = await _userManager.GetUserAsync(User);
-            var accountId = (await _dbContext.Accounts.SingleAsync(a => a.UserEmail == user.Email)).Id;
+            var account = (await _dbContext.Accounts.FirstOrDefaultAsync(a => a.UserEmail == user.Email));
 
-            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.AccountId == accountId && o.OrderStatus == OrderStatus.PENDING);
+            if (account == null) return 0;
+
+            var order = await _dbContext.Orders.FirstOrDefaultAsync(o => o.AccountId == account.Id && o.OrderStatus == OrderStatus.PENDING);
 
             if (order == null) return 0;
 

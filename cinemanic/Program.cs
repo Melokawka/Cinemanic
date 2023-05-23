@@ -48,10 +48,9 @@ namespace cinemanic
                 options.LogoutPath = "/wyloguj";
 
                 options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
-                options.Cookie.SameSite = SameSiteMode.None;
+                options.Cookie.SameSite = Microsoft.AspNetCore.Http.SameSiteMode.None;
 
                 options.Cookie.HttpOnly = true;
-
             });
 
             builder.Services.Configure<IdentityOptions>(options =>
@@ -93,110 +92,106 @@ namespace cinemanic
                 name: "default",
             pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            app.MapControllerRoute(
-            name: "login",
-            pattern: "login",
-            defaults: new { controller = "Accounts", action = "Login" });
-
-            //await new WordPressSeederService(app.Configuration["WordpressApiKey"]).UploadImageFromUrl();
+            await new WordPressSeederService(app.Configuration["WordpressApiKey"]).UploadImageFromUrl();
 
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-
                 var dbContext = services.GetRequiredService<CinemanicDbContext>();
 
-                //dbContext.Database.EnsureDeleted();
-                //dbContext.Database.EnsureCreated();
-
-                if (!dbContext.Genres.Any())
-                {
-                    await GenresService.GetGenres(dbContext);
-                }
-
-                if (!dbContext.Movies.Any())
-                {
-                    var movieService = new MovieService(dbContext, app.Configuration);
-                    await movieService.GetMovies();
-
-                    var orders = dbContext.Orders.ToList();
-                    dbContext.Orders.RemoveRange(orders);
-                    await dbContext.SaveChangesAsync();
-
-                    var stripeProductService = new ProductService();
-
-                    var products = stripeProductService.List(new ProductListOptions { Limit = 20 }); // Increase the limit if you have more products
-
-                    foreach (var product in products)
-                    {
-                        stripeProductService.Delete(product.Id);
-                    }
-                }
-
-                StripeProductService stripe = new(dbContext);
-                if (!await stripe.HasProducts())
-                {
-                    await stripe.AddStripeProducts();
-                }
-
-                var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
-
-                var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
-
-                var adminRoleName = ApplicationRole.Admin;
-                var userRoleName = ApplicationRole.User;
-
-                if (!await roleManager.RoleExistsAsync(adminRoleName))
-                {
-                    var adminRole = new ApplicationRole(adminRoleName);
-                    await roleManager.CreateAsync(adminRole);
-                }
-
-                if (!await roleManager.RoleExistsAsync(userRoleName))
-                {
-                    var userRole = new ApplicationRole(userRoleName);
-                    await roleManager.CreateAsync(userRole);
-                }
-
-                if (!dbContext.Accounts.Any())
-                {
-                    await AccountSeeder.SeedAccounts(userManager, dbContext);
-                }
-
-                if (!dbContext.Rooms.Any())
-                {
-                    RoomSeeder.SeedRooms(dbContext);
-                }
-
-                if (!dbContext.Likes.Any())
-                {
-                    await LikeSeeder.SeedLikes(dbContext);
-                }
-
-                if (!dbContext.NewsletterClients.Any())
-                {
-                    await NewsletterClientSeeder.SeedNewsletterClients(dbContext);
-                }
-
-                if (!dbContext.Screenings.Any())
-                {
-                    await ScreeningSeeder.SeedScreenings(dbContext);
-                }
-
-                if (!dbContext.Orders.Any())
-                {
-                    await OrderSeeder.SeedOrders(dbContext);
-                }
-
-                if (!dbContext.Tickets.Any())
-                {
-                    await TicketSeeder.SeedTickets(dbContext);
-                }
-
-                await IdentityDataInitializer.SeedData(userManager, roleManager);
+                await PrepareDatabase(dbContext, services, app.Configuration);
             }
 
             app.Run();
+        }
+
+        private static async Task PrepareDatabase(CinemanicDbContext dbContext, IServiceProvider services, IConfiguration configuration)
+        {
+            if (!dbContext.Genres.Any())
+            {
+                await GenresService.GetGenres(dbContext);
+            }
+
+            if (!dbContext.Movies.Any())
+            {
+                var movieService = new MovieService(dbContext, configuration);
+                await movieService.GetMovies();
+
+                var orders = dbContext.Orders.ToList();
+                dbContext.Orders.RemoveRange(orders);
+                await dbContext.SaveChangesAsync();
+
+                var stripeProductService = new ProductService();
+
+                var products = stripeProductService.List(new ProductListOptions { Limit = 20 }); // Increase the limit if you have more movies
+
+                foreach (var product in products)
+                {
+                    stripeProductService.Delete(product.Id);
+                }
+            }
+
+            StripeProductService stripe = new(dbContext);
+            if (!await stripe.HasProducts())
+            {
+                await stripe.AddStripeProducts();
+            }
+
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+
+            var roleManager = services.GetRequiredService<RoleManager<ApplicationRole>>();
+
+            var adminRoleName = ApplicationRole.Admin;
+            var userRoleName = ApplicationRole.User;
+
+            if (!await roleManager.RoleExistsAsync(adminRoleName))
+            {
+                var adminRole = new ApplicationRole(adminRoleName);
+                await roleManager.CreateAsync(adminRole);
+            }
+
+            if (!await roleManager.RoleExistsAsync(userRoleName))
+            {
+                var userRole = new ApplicationRole(userRoleName);
+                await roleManager.CreateAsync(userRole);
+            }
+
+            if (!dbContext.Accounts.Any())
+            {
+                await AccountSeeder.SeedAccounts(userManager, dbContext);
+            }
+
+            if (!dbContext.Rooms.Any())
+            {
+                RoomSeeder.SeedRooms(dbContext);
+            }
+
+            if (!dbContext.Likes.Any())
+            {
+                await LikeSeeder.SeedLikes(dbContext);
+            }
+
+            if (!dbContext.NewsletterClients.Any())
+            {
+                await NewsletterClientSeeder.SeedNewsletterClients(dbContext);
+            }
+
+            if (!dbContext.Screenings.Any())
+            {
+                await ScreeningSeeder.SeedScreenings(dbContext);
+            }
+
+            if (!dbContext.Orders.Any())
+            {
+                await OrderSeeder.SeedOrders(dbContext);
+            }
+
+            if (!dbContext.Tickets.Any())
+            {
+                await TicketSeeder.SeedTickets(dbContext);
+            }
+
+            await IdentityDataInitializer.SeedData(userManager, roleManager);
         }
     }
 }

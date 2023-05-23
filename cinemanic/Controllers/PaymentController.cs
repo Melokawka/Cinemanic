@@ -63,8 +63,20 @@ namespace cinemanic.Controllers
                 ticket.IsActive = true;
             }
 
+            List<Ticket> unpaidTicketsForDeletion = new();
+            foreach (Ticket ticket in order.Tickets)
+            {
+                var unpaidTicketsForTheSameSeat = _dbContext.Tickets
+                    .Where(t => t.ScreeningId == ticket.ScreeningId && t.Seat == ticket.Seat && t.IsActive == false)
+                    .ToList();
+
+                unpaidTicketsForDeletion.AddRange(unpaidTicketsForTheSameSeat);
+            }
+            _dbContext.RemoveRange(unpaidTicketsForDeletion);
+
             order.OrderStatus = OrderStatus.COMPLETED;
             _dbContext.Update(order);
+
             _dbContext.SaveChanges();
 
             return View(order);
