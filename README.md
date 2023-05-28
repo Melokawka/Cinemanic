@@ -47,14 +47,14 @@ The application focuses on the backend side. Its purpose is for me to learn ASP 
   
     <details>
       <summary>The CSV looks like this:</summary>
-      !(./images/csv-example.png)
+      ![ss](./images/csv-example.png)
     </details>
   
   * The admin can generate and download a PDF with a report on the past year's financial results.
   
     <details>
       <summary>The PDF looks like this:</summary>
-      !(./images/pdf-example.png)
+      ![ss](./images/pdf-example.png)
     </details>
   
 </details>
