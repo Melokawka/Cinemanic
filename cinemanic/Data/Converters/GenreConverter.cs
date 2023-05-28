@@ -2,10 +2,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace cinemanic.Data
+namespace cinemanic.Data.Converters
 {
     public class GenreConverter : JsonConverter<List<Genre>>
     {
+        /// <inheritdoc/>
         public override List<Genre> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var genres = new List<Genre>();
@@ -59,6 +60,7 @@ namespace cinemanic.Data
             return genres;
         }
 
+        /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, List<Genre> value, JsonSerializerOptions options)
         {
             throw new NotImplementedException();

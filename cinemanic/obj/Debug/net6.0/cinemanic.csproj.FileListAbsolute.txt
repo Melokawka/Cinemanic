@@ -330,3 +330,5 @@ E:\Kino2\cinemanic\obj\Debug\net6.0\cinemanic.genruntimeconfig.cache
 E:\Kino2\cinemanic\obj\Debug\net6.0\ref\cinemanic.dll
 E:\Kino2\cinemanic\bin\Debug\net6.0\Stripe.net.dll
 E:\Kino2\cinemanic\bin\Debug\net6.0\appsettings.secrets.json
+E:\Kino2\cinemanic\bin\Debug\net6.0\BouncyCastle.Crypto.dll
+E:\Kino2\cinemanic\bin\Debug\net6.0\itextsharp.dll

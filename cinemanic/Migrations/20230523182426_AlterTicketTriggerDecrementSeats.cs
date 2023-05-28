@@ -31,7 +31,7 @@ namespace cinemanic.Migrations
 
                     -- Decrement SeatsLeft in Screenings table
                     UPDATE Screenings
-                    SET SeatsLeft = SeatsLeft - 1
+                    SET SeatsLeft = SeatsLeft - (SELECT COUNT(*) FROM inserted WHERE ScreeningId = Screenings.Id AND IsActive = 1)
                     WHERE Id IN (SELECT ScreeningId FROM inserted WHERE IsActive = 1);
                 END
             ");

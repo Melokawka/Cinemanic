@@ -1,9 +1,14 @@
-﻿using cinemanic.Models;
+﻿using cinemanic.Data.Converters;
+using cinemanic.Models;
+using cinemanic.Utilities;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
 namespace cinemanic.Data
 {
+    /// <summary>
+    /// Service for interacting with movie data.
+    /// </summary>
     public class MovieService
     {
         private readonly CinemanicDbContext _dbContext;
@@ -12,12 +17,21 @@ namespace cinemanic.Data
         private static HttpClient httpClient = new();
         private static JsonSerializerOptions jsonOptions = new();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MovieService"/> class.
+        /// </summary>
+        /// <param name="dbContext">The CinemanicDbContext instance.</param>
+        /// <param name="configuration">The IConfiguration instance.</param>
         public MovieService(CinemanicDbContext dbContext, IConfiguration configuration)
         {
             _dbContext = dbContext;
             _tmdbApiKey = configuration["TmdbApiKey"];
         }
 
+        /// <summary>
+        /// Retrieves movies from the TMDB API and saves them to the database.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task GetMovies()
         {
             List<Movie> movies = new();
@@ -46,6 +60,10 @@ namespace cinemanic.Data
             await _dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Retrieves a movie from the TMDB API.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private async Task<Movie> GetMovie()
         {
             int movieId = await FindRandomMovieId();
@@ -66,6 +84,10 @@ namespace cinemanic.Data
             return response;
         }
 
+        /// <summary>
+        /// Finds a random movie ID from the TMDB API.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private async Task<int> FindRandomMovieId()
         {
             HttpResponseMessage existsHttp;
@@ -83,6 +105,10 @@ namespace cinemanic.Data
             return movieId;
         }
 
+        /// <summary>
+        /// Retrieves movie information including genres and screenings.
+        /// </summary>
+        /// <returns>A list of MovieInfo objects.</returns>
         public List<MovieInfo> GetMoviesInfo()
         {
             var movies = _dbContext.Movies

@@ -4,6 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cinemanic.Data
 {
+    /// <summary>
+    /// Represents the database context for the Cinemanic application.
+    /// </summary>
     public class CinemanicDbContext : DbContext
     {
         public DbSet<Account> Accounts { get; set; }
@@ -20,6 +23,10 @@ namespace cinemanic.Data
         public DbSet<ApplicationRole> ApplicationRoles { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
+        /// <summary>
+        /// Configures the database connection and options.
+        /// </summary>
+        /// <param name="optionsBuilder">The options builder for configuring the database.</param>
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
@@ -37,6 +44,10 @@ namespace cinemanic.Data
             }
         }
 
+        /// <summary>
+        /// Configures the database model and relationships.
+        /// </summary>
+        /// <param name="modelBuilder">The model builder for configuring the database model.</param>
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Ticket>()

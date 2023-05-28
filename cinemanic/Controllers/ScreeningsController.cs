@@ -1,5 +1,6 @@
 ﻿using cinemanic.Data;
 using cinemanic.Models;
+using cinemanic.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,16 +8,28 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cinemanic.Controllers
 {
+    /// <summary>
+    /// Controller for handling screenings-related actions.
+    /// </summary>
     [Route("seanse")]
     public class ScreeningsController : Controller
     {
         private readonly CinemanicDbContext _dbContext;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScreeningsController"/> class.
+        /// </summary>
+        /// <param name="context">The database context.</param>
         public ScreeningsController(CinemanicDbContext context)
         {
             _dbContext = context;
         }
 
+        /// <summary>
+        /// Retrieves a list of screenings.
+        /// </summary>
+        /// <param name="page">The page number.</param>
+        /// <returns>The view displaying the list of screenings.</returns>
         [HttpGet("")]
         public async Task<IActionResult> Index(int? page)
         {
@@ -52,6 +65,11 @@ namespace cinemanic.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Retrieves details of a specific movie screening.
+        /// </summary>
+        /// <param name="id">The ID of the movie.</param>
+        /// <returns>The view displaying the details of the movie screening.</returns>
         [HttpGet("film/{id}")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -67,6 +85,10 @@ namespace cinemanic.Controllers
             return View(movieInfo[0]);
         }
 
+        /// <summary>
+        /// Retrieves a list of screenings for administrative purposes.
+        /// </summary>
+        /// <returns>The view displaying the list of screenings for admin.</returns>
         [Authorize(Roles = "Admin")]
         [HttpGet("admin")]
         public async Task<IActionResult> Admin()
@@ -75,6 +97,10 @@ namespace cinemanic.Controllers
             return View(await cinemanicDbContext.ToListAsync());
         }
 
+        /// <summary>
+        /// Retrieves a list of archived screenings for administrative purposes.
+        /// </summary>
+        /// <returns>The view displaying the list of archived screenings for admin.</returns>
         [Authorize(Roles = "Admin")]
         [HttpGet("admin/archiwum")]
         public async Task<IActionResult> AdminArchive()
@@ -83,6 +109,10 @@ namespace cinemanic.Controllers
             return View(await cinemanicDbContext.ToListAsync());
         }
 
+        /// <summary>
+        /// Displays the create screening form for admin.
+        /// </summary>
+        /// <returns>The view displaying the create screening form.</returns>
         [HttpGet("create")]
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
@@ -92,6 +122,11 @@ namespace cinemanic.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Creates a new screening.
+        /// </summary>
+        /// <param name="screening">The screening object to create.</param>
+        /// <returns>Redirects to the admin view after successful creation.</returns>
         [HttpPost("create")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -103,6 +138,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Admin));
         }
 
+        /// <summary>
+        /// Displays the edit screening form for admin.
+        /// </summary>
+        /// <param name="id">The ID of the screening to edit.</param>
+        /// <returns>The view displaying the edit screening form.</returns>
         [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
@@ -122,6 +162,12 @@ namespace cinemanic.Controllers
             return View(screening);
         }
 
+        /// <summary>
+        /// Updates an existing screening.
+        /// </summary>
+        /// <param name="id">The ID of the screening to update.</param>
+        /// <param name="screening">The updated screening object.</param>
+        /// <returns>Redirects to the admin view after successful update.</returns>
         [HttpPost("edit/{id}")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -138,6 +184,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Admin));
         }
 
+        /// <summary>
+        /// Displays the delete screening form for admin.
+        /// </summary>
+        /// <param name="id">The ID of the screening to delete.</param>
+        /// <returns>The view displaying the delete screening form.</returns>
         [HttpGet("delete/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
@@ -159,6 +210,11 @@ namespace cinemanic.Controllers
             return View(screening);
         }
 
+        /// <summary>
+        /// Deletes a screening.
+        /// </summary>
+        /// <param name="id">The ID of the screening to delete.</param>
+        /// <returns>Redirects to the admin view after successful deletion.</returns>
         [HttpPost("delete/{id}"), ActionName("Delete")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -178,6 +234,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Admin));
         }
 
+        /// <summary>
+        /// Checks if a screening exists.
+        /// </summary>
+        /// <param name="id">The ID of the screening.</param>
+        /// <returns><c>true</c> if the screening exists; otherwise, <c>false</c>.</returns>
         private bool ScreeningExists(int id)
         {
             return (_dbContext.Screenings?.Any(e => e.Id == id)).GetValueOrDefault();

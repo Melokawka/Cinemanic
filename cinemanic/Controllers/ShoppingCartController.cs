@@ -1,5 +1,6 @@
 ﻿using cinemanic.Data;
 using cinemanic.Models;
+using cinemanic.Utilities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -9,6 +10,9 @@ using Stripe.Checkout;
 
 namespace cinemanic.Controllers
 {
+    /// <summary>
+    /// Controller for handling shopping cart-related actions.
+    /// </summary>
     [Route("koszyk")]
     public class ShoppingCartController : Controller
     {
@@ -16,12 +20,21 @@ namespace cinemanic.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly CinemanicDbContext _dbContext;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ShoppingCartController"/> class.
+        /// </summary>
+        /// <param name="userManager">The user manager.</param>
+        /// <param name="dbContext">The database context.</param>
         public ShoppingCartController(UserManager<ApplicationUser> userManager, CinemanicDbContext dbContext)
         {
             _userManager = userManager;
             _dbContext = dbContext;
         }
 
+        /// <summary>
+        /// Displays the shopping cart page.
+        /// </summary>
+        /// <returns>The view displaying the shopping cart contents.</returns>
         [Authorize]
         [HttpGet("")]
         public async Task<IActionResult> Index()
@@ -44,6 +57,11 @@ namespace cinemanic.Controllers
             return View(tickets);
         }
 
+        /// <summary>
+        /// Processes the payment for an order.
+        /// </summary>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <returns>The result of the payment process.</returns>
         [Authorize]
         [HttpPost("oplacenie")]
         public async Task<IActionResult> Pay(int orderId)
@@ -64,6 +82,10 @@ namespace cinemanic.Controllers
             return await ProcessOrder(order);
         }
 
+        /// <summary>
+        /// Buys the items in the shopping cart.
+        /// </summary>
+        /// <returns>The result of the purchase.</returns>
         [Authorize]
         [HttpPost("zakup")]
         public async Task<IActionResult> Buy()
@@ -87,6 +109,10 @@ namespace cinemanic.Controllers
             return await ProcessOrder(order);
         }
 
+        /// <summary>
+        /// Retrieves the count of products in the shopping cart.
+        /// </summary>
+        /// <returns>The number of products in the shopping cart.</returns>
         [HttpGet("liczba-produktow")]
         [Authorize]
         public async Task<int> CountProductsInCart()
@@ -103,6 +129,11 @@ namespace cinemanic.Controllers
             return await _dbContext.Tickets.CountAsync(t => t.OrderId == order.Id);
         }
 
+        /// <summary>
+        /// Processes the order by preparing line items and creating a payment session.
+        /// </summary>
+        /// <param name="order">The order to process.</param>
+        /// <returns>The result of the order processing.</returns>
         private async Task<IActionResult> ProcessOrder(Order order)
         {
             var lineItems = await ShoppingCartFunctions.PrepareLineItems(order.Tickets);
@@ -113,6 +144,12 @@ namespace cinemanic.Controllers
             return new StatusCodeResult(303);
         }
 
+        /// <summary>
+        /// Creates a payment session for the given line items and order ID.
+        /// </summary>
+        /// <param name="lineItems">The line items for the payment session.</param>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <returns>The created payment session.</returns>
         private async Task<Session> CreatePaymentSession(List<SessionLineItemOptions> lineItems, int orderId)
         {
             var options = new SessionCreateOptions

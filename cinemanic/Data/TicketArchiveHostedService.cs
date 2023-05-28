@@ -2,17 +2,25 @@
 using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Hosted service for ticket archiving.
+/// </summary>
 public class TicketArchiveHostedService : IHostedService, IDisposable
 {
     private Timer _timer;
     private readonly IServiceProvider _serviceProvider;
     private DateTime today;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TicketArchiveHostedService"/> class.
+    /// </summary>
+    /// <param name="serviceProvider">The service provider.</param>
     public TicketArchiveHostedService(IServiceProvider serviceProvider)
     {
         _serviceProvider = serviceProvider;
     }
 
+    /// <inheritdoc/>
     public Task StartAsync(CancellationToken cancellationToken)
     {
         _timer = new Timer(DoWork, null, TimeSpan.FromSeconds(15), TimeSpan.FromDays(1));
@@ -20,6 +28,10 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <summary>
+    /// Performs the archive process for tickets and screenings.
+    /// </summary>
+    /// <param name="state">The state object passed to the timer.</param>
     private async void DoWork(object state)
     {
         today = DateTime.Now;
@@ -63,6 +75,11 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
         }
     }
 
+    /// <summary>
+    /// Prepares a list of archived tickets based on the tickets to archive.
+    /// </summary>
+    /// <param name="ticketsToArchive">The list of tickets to archive.</param>
+    /// <returns>A list of archived tickets.</returns>
     private async Task<List<ArchivedTicket>> PrepareArchivedTickets(List<Ticket> ticketsToArchive)
     {
         var archivedTickets = ticketsToArchive.Select(t => new ArchivedTicket
@@ -81,6 +98,12 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
         return archivedTickets;
     }
 
+    /// <summary>
+    /// Prepares a list of archived screenings based on the screenings to archive and associated tickets.
+    /// </summary>
+    /// <param name="screeningsToArchive">The list of screenings to archive.</param>
+    /// <param name="ticketsToArchive">The list of tickets to archive.</param>
+    /// <returns>A list of archived screenings.</returns>
     private async Task<List<ArchivedScreening>> PrepareArchivedScreenings(List<Screening> screeningsToArchive, List<Ticket> ticketsToArchive)
     {
         List<ArchivedScreening> archivedScreenings = new();
@@ -109,6 +132,7 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
         return archivedScreenings;
     }
 
+    /// <inheritdoc/>
     public Task StopAsync(CancellationToken cancellationToken)
     {
         _timer?.Change(Timeout.Infinite, 0);
@@ -116,6 +140,7 @@ public class TicketArchiveHostedService : IHostedService, IDisposable
         return Task.CompletedTask;
     }
 
+    /// <inheritdoc/>
     public void Dispose()
     {
         _timer?.Dispose();

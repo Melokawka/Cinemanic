@@ -8,6 +8,9 @@ using Stripe.Checkout;
 
 namespace cinemanic.Controllers
 {
+    /// <summary>
+    /// Controller for handling payment-related actions.
+    /// </summary>
     [Route("platnosc")]
     [Authorize]
     public class PaymentController : Controller
@@ -15,12 +18,22 @@ namespace cinemanic.Controllers
         private readonly CinemanicDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PaymentController"/> class.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="userManager">The user manager.</param>
         public PaymentController(CinemanicDbContext dbContext, UserManager<ApplicationUser> userManager)
         {
             _dbContext = dbContext;
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Action method for handling successful payment.
+        /// </summary>
+        /// <param name="session_id">The session ID for the payment.</param>
+        /// <returns>The result of the payment success action.</returns>
         [HttpGet("sukces")]
         public ActionResult PaymentSuccess([FromQuery] string session_id)
         {
@@ -41,6 +54,12 @@ namespace cinemanic.Controllers
             return RedirectToAction("PaymentConfirmation", new { orderId = order.Id, session_id = session_id });
         }
 
+        /// <summary>
+        /// Action method for displaying payment confirmation.
+        /// </summary>
+        /// <param name="orderId">The ID of the order.</param>
+        /// <param name="session_id">The session ID for the payment.</param>
+        /// <returns>The result of the payment confirmation action.</returns>
         [HttpGet("potwierdzenie")]
         public IActionResult PaymentConfirmation(int orderId, string session_id)
         {

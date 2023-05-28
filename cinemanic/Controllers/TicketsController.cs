@@ -8,18 +8,30 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cinemanic.Controllers
 {
+    /// <summary>
+    /// Controller for managing tickets.
+    /// </summary>
     [Route("bilety")]
     public class TicketsController : Controller
     {
         private readonly CinemanicDbContext _dbContext;
         private readonly UserManager<ApplicationUser> _userManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TicketsController"/> class.
+        /// </summary>
+        /// <param name="context">The CinemanicDbContext.</param>
+        /// <param name="userManager">The UserManager.</param>
         public TicketsController(CinemanicDbContext context, UserManager<ApplicationUser> userManager)
         {
             _dbContext = context;
             _userManager = userManager;
         }
 
+        /// <summary>
+        /// Gets the admin view for managing tickets.
+        /// </summary>
+        /// <returns>The admin view.</returns>
         [HttpGet("")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Admin()
@@ -28,6 +40,11 @@ namespace cinemanic.Controllers
             return View(await cinemanicDbContext.ToListAsync());
         }
 
+        /// <summary>
+        /// Gets the details view for a ticket with the specified ID.
+        /// </summary>
+        /// <param name="id">The ID of the ticket.</param>
+        /// <returns>The details view.</returns>
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> Details(int? id)
@@ -49,6 +66,12 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
+        /// <summary>
+        /// Gets the buy view for purchasing a ticket.
+        /// </summary>
+        /// <param name="screeningId">The ID of the screening.</param>
+        /// <param name="movieId">The ID of the movie.</param>
+        /// <returns>The buy view.</returns>
         [HttpGet("kup")]
         [Authorize]
         public async Task<IActionResult> Buy(int screeningId, int movieId)
@@ -79,6 +102,11 @@ namespace cinemanic.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Retrieves the list of free seats for the specified screening.
+        /// </summary>
+        /// <param name="screeningId">The ID of the screening.</param>
+        /// <returns>The list of free seats.</returns>
         public async Task<List<int>> GetFreeSeatsList(int screeningId)
         {
             var seatsTaken = await _dbContext.Tickets.Where(t => t.ScreeningId == screeningId && t.IsActive).Select(t => t.Seat).ToListAsync();
@@ -90,10 +118,16 @@ namespace cinemanic.Controllers
             return freeSeats;
         }
 
-        // doesnt factor in the situation where the customer buys the same seat for the same screening twice
+
+        /// <summary>
+        /// Handles the purchase of a ticket.
+        /// </summary>
+        /// <param name="ticket">The ticket to be purchased.</param>
+        /// <returns>The action result after purchasing the ticket.</returns>
         [HttpPost("kup")]
         [Authorize]
         [ValidateAntiForgeryToken]
+        // doesnt factor in the situation where the customer buys the same seat for the same screening twice
         public async Task<IActionResult> Buy([FromForm] Ticket ticket)
         {
             bool hasDiscount = (ticket.PricingType == PricingType.ULGOWY);
@@ -136,12 +170,19 @@ namespace cinemanic.Controllers
             return RedirectToAction("Index", "Screenings");
         }
 
+
         private void AssignTicketToOrder(Ticket ticket, Order order)
         {
             ticket.OrderId = order.Id;
             ticket.Order = order;
         }
 
+        /// <summary>
+        /// Calculates the price for a ticket for a given screening and seat.
+        /// </summary>
+        /// <param name="screeningId">The ID of the screening.</param>
+        /// <param name="seat">The seat number.</param>
+        /// <returns>The calculated ticket price.</returns>
         [HttpGet("oblicz-cene")]
         public async Task<double> CalculatePrice(int screeningId, int seat)
         {
@@ -152,6 +193,7 @@ namespace cinemanic.Controllers
                 .FirstOrDefaultAsync();
 
             if (screening.Movie.Adult) ticketPrice += 2.0;
+            if (screening.Is3D) ticketPrice += 2.0;
 
             var seatsLeft = (await GetFreeSeatsList(screeningId)).Count;
 
@@ -165,6 +207,11 @@ namespace cinemanic.Controllers
             return ticketPrice;
         }
 
+        /// <summary>
+        /// Removes a ticket from the user's order.
+        /// </summary>
+        /// <param name="id">The ID of the ticket to be removed.</param>
+        /// <returns>The action result after removing the ticket.</returns>
         [HttpPost("usun/{id}")]
         [Authorize]
         public async Task<IActionResult> RemoveTicket(int id)
@@ -191,6 +238,10 @@ namespace cinemanic.Controllers
             return RedirectToAction("Index", "ShoppingCart");
         }
 
+        /// <summary>
+        /// Retrieves the view for creating a new ticket.
+        /// </summary>
+        /// <returns>The view for creating a new ticket.</returns>
         [HttpGet("create")]
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
@@ -203,6 +254,11 @@ namespace cinemanic.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Creates a new ticket.
+        /// </summary>
+        /// <param name="ticket">The ticket to be created.</param>
+        /// <returns>The action result after creating the ticket.</returns>
         [HttpPost("create")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -214,6 +270,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Admin));
         }
 
+        /// <summary>
+        /// Retrieves the view for editing an existing ticket.
+        /// </summary>
+        /// <param name="id">The ID of the ticket to be edited.</param>
+        /// <returns>The view for editing an existing ticket.</returns>
         [HttpGet("edit/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
@@ -237,6 +298,12 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
+        /// <summary>
+        /// Updates an existing ticket.
+        /// </summary>
+        /// <param name="id">The ID of the ticket to be updated.</param>
+        /// <param name="ticket">The updated ticket information.</param>
+        /// <returns>The action result after updating the ticket.</returns>
         [HttpPost("edit/{id}")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -253,6 +320,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Details), new { id = id });
         }
 
+        /// <summary>
+        /// Retrieves the view for deleting a ticket.
+        /// </summary>
+        /// <param name="id">The ID of the ticket to be deleted.</param>
+        /// <returns>The view for deleting a ticket.</returns>
         [HttpGet("delete/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
@@ -274,6 +346,11 @@ namespace cinemanic.Controllers
             return View(ticket);
         }
 
+        /// <summary>
+        /// Deletes a ticket.
+        /// </summary>
+        /// <param name="id">The ID of the ticket to be deleted.</param>
+        /// <returns>The action result after deleting the ticket.</returns>
         [HttpPost("delete/{id}"), ActionName("Delete")]
         [Authorize(Roles = "Admin")]
         [ValidateAntiForgeryToken]
@@ -293,6 +370,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+        /// <summary>
+        /// Checks if a ticket with the specified ID exists.
+        /// </summary>
+        /// <param name="id">The ID of the ticket.</param>
+        /// <returns>True if the ticket exists, otherwise false.</returns>
         private bool TicketExists(int id)
         {
             return (_dbContext.Tickets?.Any(e => e.Id == id)).GetValueOrDefault();

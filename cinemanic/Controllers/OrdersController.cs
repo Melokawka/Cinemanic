@@ -7,23 +7,39 @@ using Microsoft.EntityFrameworkCore;
 
 namespace cinemanic.Controllers
 {
+    /// <summary>
+    /// Controller for managing orders.
+    /// </summary>
     [Route("zamowienia")]
     [Authorize(Roles = "Admin")]
     public class OrdersController : Controller
     {
         private readonly CinemanicDbContext _context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="OrdersController"/> class.
+        /// </summary>
+        /// <param name="context">The CinemanicDbContext instance.</param>
         public OrdersController(CinemanicDbContext context)
         {
             _context = context;
         }
 
+        /// <summary>
+        /// Displays the admin page with a list of orders.
+        /// </summary>
+        /// <returns>The view for the admin page.</returns>
         public async Task<IActionResult> Admin()
         {
             var cinemanicDbContext = _context.Orders.Include(o => o.Account);
             return View(await cinemanicDbContext.ToListAsync());
         }
 
+        /// <summary>
+        /// Displays details for a specific order.
+        /// </summary>
+        /// <param name="id">The ID of the order.</param>
+        /// <returns>The view for the order details page.</returns>
         [HttpGet("{id}")]
         public async Task<IActionResult> Details(int? id)
         {
@@ -43,6 +59,10 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
+        /// <summary>
+        /// Displays the page for creating a new order.
+        /// </summary>
+        /// <returns>The view for the order creation page.</returns>
         [HttpGet("create")]
         public IActionResult Create()
         {
@@ -50,6 +70,11 @@ namespace cinemanic.Controllers
             return View();
         }
 
+        /// <summary>
+        /// Creates a new order.
+        /// </summary>
+        /// <param name="order">The order object to be created.</param>
+        /// <returns>The result of the order creation process.</returns>
         [HttpPost("create")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,TotalPrice,AccountId")] Order order)
@@ -61,6 +86,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Admin));
         }
 
+        /// <summary>
+        /// Displays the page for editing an existing order.
+        /// </summary>
+        /// <param name="id">The ID of the order to be edited.</param>
+        /// <returns>The view for the order editing page.</returns>
         [HttpGet("edit/{id}")]
         public async Task<IActionResult> Edit(int? id)
         {
@@ -78,6 +108,12 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
+        /// <summary>
+        /// Edits an existing order.
+        /// </summary>
+        /// <param name="id">The ID of the order to be edited.</param>
+        /// <param name="order">The updated order object.</param>
+        /// <returns>The result of the order editing process.</returns>
         [HttpPost("edit/{id}")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,TotalPrice,AccountId")] Order order)
@@ -95,6 +131,11 @@ namespace cinemanic.Controllers
             return RedirectToAction(nameof(Admin));
         }
 
+        /// <summary>
+        /// Displays the page for deleting an order.
+        /// </summary>
+        /// <param name="id">The ID of the order to be deleted.</param>
+        /// <returns>The view for the order deletion page.</returns>
         [HttpGet("delete/{id}")]
         public async Task<IActionResult> Delete(int? id)
         {
@@ -114,6 +155,11 @@ namespace cinemanic.Controllers
             return View(order);
         }
 
+        /// <summary>
+        /// Deletes a specific order.
+        /// </summary>
+        /// <param name="id">The ID of the order to be deleted.</param>
+        /// <returns>The result of the order deletion process.</returns>
         [HttpPost("delete/{id}"), ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

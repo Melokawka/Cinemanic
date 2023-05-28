@@ -1,10 +1,14 @@
 ﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace cinemanic.Data
+namespace cinemanic.Data.Seeders
 {
     public class LikeSeeder
     {
+        /// <summary>
+        /// Seeds likes in the database.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
         public static async Task SeedLikes(CinemanicDbContext dbContext)
         {
             var random = new Random();

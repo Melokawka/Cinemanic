@@ -2,10 +2,18 @@
 using cinemanic.Models;
 using Newtonsoft.Json.Linq;
 
-namespace cinemanic.Data
+namespace cinemanic.Utilities
 {
+    /// <summary>
+    /// Helper functions for movie-related operations.
+    /// </summary>
     public class MovieServiceFunctions
     {
+        /// <summary>
+        /// Prepares movie information by mapping it to MovieInfo objects and ordering screenings.
+        /// </summary>
+        /// <param name="movies">The list of Movie objects.</param>
+        /// <returns>A list of MovieInfo objects.</returns>
         public static List<MovieInfo> PrepareMoviesInfo(List<Movie> movies)
         {
             var config = new MapperConfiguration(cfg =>
@@ -28,6 +36,11 @@ namespace cinemanic.Data
             return moviesInfo;
         }
 
+        /// <summary>
+        /// Finds the trailer key from the JSON response.
+        /// </summary>
+        /// <param name="json">The JSON response containing movie data.</param>
+        /// <returns>The trailer key if found, or null.</returns>
         public static string FindTrailerKey(string json)
         {
             var jObject = JObject.Parse(json);

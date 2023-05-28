@@ -1,19 +1,28 @@
 using cinemanic.Data;
+using cinemanic.Data.Seeders;
 using cinemanic.Models;
-using cinemanic.Seeders;
 using Microsoft.AspNetCore.Identity;
 using Stripe;
 
 namespace cinemanic
 {
+    /// <summary>
+    /// The entry point class for the application.
+    /// </summary>
     public class Program
     {
+        /// <summary>
+        /// The main entry point of the application.
+        /// </summary>
+        /// <param name="args">Command-line arguments.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Configuration.AddJsonFile("appsettings.secrets.json", optional: true, reloadOnChange: true);
 
+            // Configure CORS policy
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowWordPressApi",
@@ -27,10 +36,13 @@ namespace cinemanic
 
             builder.Services.AddControllersWithViews();
 
+            // Add CinemanicDbContext
             builder.Services.AddDbContext<CinemanicDbContext>();
 
+            // Add TicketArchiveHostedService
             builder.Services.AddHostedService<TicketArchiveHostedService>();
 
+            // Add Identity services
             builder.Services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<CinemanicDbContext>()
                 .AddDefaultTokenProviders()
@@ -40,6 +52,7 @@ namespace cinemanic
 
             builder.Services.AddAuthentication();
 
+            // Configure application cookie
             builder.Services.ConfigureApplicationCookie(options =>
             {
                 options.Cookie.Name = "_auth";
@@ -53,6 +66,7 @@ namespace cinemanic
                 options.Cookie.HttpOnly = true;
             });
 
+            // Configure Identity options
             builder.Services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequiredLength = 4;
@@ -61,12 +75,14 @@ namespace cinemanic
                 options.Password.RequireUppercase = false;
             });
 
+            // Configure logging
             builder.Services.AddLogging(logging =>
             {
                 logging.ClearProviders();
                 logging.AddConsole();
             });
 
+            // Add services
             builder.Services.AddScoped<PostService>();
             builder.Services.AddScoped<MovieService>();
 
@@ -107,22 +123,25 @@ namespace cinemanic
 
         private static async Task PrepareDatabase(CinemanicDbContext dbContext, IServiceProvider services, IConfiguration configuration)
         {
+            // Seed genres if they don't exist
             if (!dbContext.Genres.Any())
             {
                 await GenresService.GetGenres(dbContext);
             }
 
+            // Seed movies if they don't exist
             if (!dbContext.Movies.Any())
             {
                 var movieService = new MovieService(dbContext, configuration);
                 await movieService.GetMovies();
 
+                // Remove existing orders
                 var orders = dbContext.Orders.ToList();
                 dbContext.Orders.RemoveRange(orders);
                 await dbContext.SaveChangesAsync();
 
+                // Delete Stripe products
                 var stripeProductService = new ProductService();
-
                 var products = stripeProductService.List(new ProductListOptions { Limit = 20 }); // Increase the limit if you have more movies
 
                 foreach (var product in products)
@@ -131,6 +150,7 @@ namespace cinemanic
                 }
             }
 
+            // Add Stripe products if they don't exist
             StripeProductService stripe = new(dbContext);
             if (!await stripe.HasProducts())
             {
@@ -144,12 +164,14 @@ namespace cinemanic
             var adminRoleName = ApplicationRole.Admin;
             var userRoleName = ApplicationRole.User;
 
+            // Create admin role if it doesn't exist
             if (!await roleManager.RoleExistsAsync(adminRoleName))
             {
                 var adminRole = new ApplicationRole(adminRoleName);
                 await roleManager.CreateAsync(adminRole);
             }
 
+            // Create user role if it doesn't exist
             if (!await roleManager.RoleExistsAsync(userRoleName))
             {
                 var userRole = new ApplicationRole(userRoleName);
@@ -191,6 +213,7 @@ namespace cinemanic
                 await TicketSeeder.SeedTickets(dbContext);
             }
 
+            // Seed identity data
             await IdentityDataInitializer.SeedData(userManager, roleManager);
         }
     }

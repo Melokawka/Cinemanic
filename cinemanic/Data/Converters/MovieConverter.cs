@@ -2,10 +2,11 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace cinemanic.Data
+namespace cinemanic.Data.Converters
 {
     public class MovieConverter : JsonConverter<Movie>
     {
+        /// <inheritdoc/>
         public override Movie Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             var movie = new Movie();
@@ -91,6 +92,7 @@ namespace cinemanic.Data
             return movie;
         }
 
+        /// <inheritdoc/>
         public override void Write(Utf8JsonWriter writer, Movie value, JsonSerializerOptions options)
         {
             throw new NotImplementedException();

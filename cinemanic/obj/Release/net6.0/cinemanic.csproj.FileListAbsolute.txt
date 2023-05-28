@@ -598,3 +598,8 @@ E:\Kino2\cinemanic\obj\Release\net6.0\cinemanic.genruntimeconfig.cache
 E:\Kino2\cinemanic\obj\Release\net6.0\ref\cinemanic.dll
 E:\Kino2\cinemanic\bin\Release\net6.0\Stripe.net.dll
 E:\Kino2\cinemanic\bin\Release\net6.0\appsettings.secrets.json
+E:\Kino2\cinemanic\bin\Release\net6.0\BouncyCastle.Crypto.dll
+E:\Kino2\cinemanic\bin\Release\net6.0\itextsharp.dll
+E:\Kino2\cinemanic\bin\Release\net6.0\docfx.json
+E:\Kino2\cinemanic\bin\Release\net6.0\_site\manifest.json
+E:\Kino2\cinemanic\bin\Release\net6.0\_site\search-stopwords.json

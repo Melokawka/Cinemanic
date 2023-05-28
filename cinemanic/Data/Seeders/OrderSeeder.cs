@@ -1,10 +1,14 @@
 ﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace cinemanic.Data
+namespace cinemanic.Data.Seeders
 {
     public class OrderSeeder
     {
+        /// <summary>
+        /// Seeds orders in the database.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
         public static async Task SeedOrders(CinemanicDbContext dbContext)
         {
             var random = new Random();

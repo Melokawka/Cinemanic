@@ -9,6 +9,9 @@ using JsonSerializer = System.Text.Json.JsonSerializer;
 
 namespace cinemanic.Data
 {
+    /// <summary>
+    /// Service for seeding WordPress with mock data.
+    /// </summary>
     public class WordPressSeederService
     {
         private readonly string _baseUrl;
@@ -18,6 +21,10 @@ namespace cinemanic.Data
                                                 "https://images.unsplash.com/photo-1598899134739-24c46f58b8c0?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1156&q=80",
                                                 "https://images.unsplash.com/photo-1536440136628-849c177e76a1?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1025&q=80"};
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="WordPressSeederService"/> class.
+        /// </summary>
+        /// <param name="wordpressApiKey">The WordPress API key.</param>
         public WordPressSeederService(string wordpressApiKey)
         {
             _wordpressApiKey = wordpressApiKey;
@@ -25,9 +32,17 @@ namespace cinemanic.Data
             _httpClient = new HttpClient();
         }
 
+        /// <summary>
+        /// Uploads images from URLs to the WordPress media library.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UploadImageFromUrl()
         {
             List<int> imageIDs = new();
+
+            bool hasNinePosts = await CheckForExistingPosts();
+
+            if (hasNinePosts) return;
 
             foreach (string imageUrl in imageUrls)
             {
@@ -50,29 +65,37 @@ namespace cinemanic.Data
 
                 imageIDs.Add(imageId);
             }
-            await CreateMockPosts(imageIDs);
+
+            for (int i = 0; i < 3; i++) await CreateMockPosts(imageIDs);
         }
 
+        /// <summary>
+        /// Creates mock posts using the provided image IDs.
+        /// </summary>
+        /// <param name="imageIDs">The list of image IDs to use.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task CreateMockPosts(List<int> imageIDs)
         {
-            bool hasExistingPosts = await CheckForExistingPosts();
+            var faker = new Faker();
+            string loremText;
 
-            if (!hasExistingPosts)
+            int iterator = 3;
+            foreach (int image in imageIDs)
             {
-                var faker = new Faker();
-                string loremText;
-
-                int iterator = 3;
-                foreach (int image in imageIDs)
-                {
-                    loremText = faker.Lorem.Paragraphs(3);
-                    var encodedLoremText = HttpUtility.HtmlEncode(loremText);
-                    await CreateMockPost("Post " + iterator, encodedLoremText, image);
-                    iterator--;
-                }
+                loremText = faker.Lorem.Paragraphs(3);
+                var encodedLoremText = HttpUtility.HtmlEncode(loremText);
+                await CreateMockPost("Post " + iterator, encodedLoremText, image);
+                iterator--;
             }
         }
 
+        /// <summary>
+        /// Creates a mock post with the given title, content, and featured image.
+        /// </summary>
+        /// <param name="title">The title of the post.</param>
+        /// <param name="content">The content of the post.</param>
+        /// <param name="imageID">The ID of the featured image.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private async Task CreateMockPost(string title, string content, int imageID)
         {
             string url = _baseUrl + "/wp-json/wp/v2/posts";
@@ -97,6 +120,11 @@ namespace cinemanic.Data
             var responseContent = await response.Content.ReadAsStringAsync();
         }
 
+        /// <summary>
+        /// Retrieves posts from the specified API endpoint.
+        /// </summary>
+        /// <param name="apiEndpoint">The API endpoint to retrieve posts from.</param>
+        /// <returns>A list of posts.</returns>
         public async Task<List<Post>> GetPostsAsync(string apiEndpoint)
         {
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiEndpoint);
@@ -111,13 +139,17 @@ namespace cinemanic.Data
             return posts;
         }
 
+        /// <summary>
+        /// Checks if there are existing posts in the WordPress site.
+        /// </summary>
+        /// <returns><c>true</c> if there are existing posts; otherwise, <c>false</c>.</returns>
         private async Task<bool> CheckForExistingPosts()
         {
             string url = _baseUrl + "/wp-json/wp/v2/posts";
 
             var posts = await GetPostsAsync(url);
 
-            return (posts != null && posts.Count > 1);
+            return (posts != null && posts.Count > 8);
         }
     }
 }

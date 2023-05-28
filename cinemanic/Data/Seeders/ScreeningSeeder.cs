@@ -1,10 +1,14 @@
 ﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace cinemanic.Data
+namespace cinemanic.Data.Seeders
 {
     public class ScreeningSeeder
     {
+        /// <summary>
+        /// Seeds screenings in the database.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
         public static async Task SeedScreenings(CinemanicDbContext dbContext)
         {
             var random = new Random();
@@ -36,6 +40,10 @@ namespace cinemanic.Data
             dbContext.SaveChanges();
         }
 
+        /// <summary>
+        /// Generates a random screening date and time within a specific range.
+        /// </summary>
+        /// <returns>A randomly generated screening date and time.</returns>
         private static DateTime GenerateRandomdate()
         {
             var random = new Random();
@@ -49,7 +57,7 @@ namespace cinemanic.Data
             //int range = (endDateTime - startDateTime).Days;
             int range = (maxDate - minDate).Days;
 
-            var randomTime = TimeSpan.FromMinutes(random.Next(10, 26) * 60 + (random.Next(2) * 30));
+            var randomTime = TimeSpan.FromMinutes(random.Next(10, 26) * 60 + random.Next(2) * 30);
 
             return minDate.AddDays(random.Next(range)) + randomTime;
         }

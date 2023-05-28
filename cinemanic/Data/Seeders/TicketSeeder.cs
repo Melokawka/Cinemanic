@@ -1,10 +1,18 @@
 ﻿using cinemanic.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace cinemanic.Data
+namespace cinemanic.Data.Seeders
 {
+    /// <summary>
+    /// Utility class for seeding tickets in the database.
+    /// </summary>
     public class TicketSeeder
     {
+        /// <summary>
+        /// Seeds tickets in the database.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public static async Task SeedTickets(CinemanicDbContext dbContext)
         {
             var screeningIds = await TicketSeederFunctions.GetScreeningIds(dbContext);
@@ -21,6 +29,13 @@ namespace cinemanic.Data
             await TicketSeederFunctions.SaveTickets(dbContext, tickets);
         }
 
+        /// <summary>
+        /// Generates random tickets for the provided screening and order data.
+        /// </summary>
+        /// <param name="screeningIds">The list of screening IDs.</param>
+        /// <param name="orderIds">The list of order IDs.</param>
+        /// <param name="dbContext">The database context.</param>
+        /// <returns>A list of generated tickets.</returns>
         private async static Task<List<Ticket>> GenerateRandomTickets(List<int> screeningIds, List<int> orderIds, CinemanicDbContext dbContext)
         {
             var random = new Random();
@@ -50,6 +65,13 @@ namespace cinemanic.Data
             return tickets;
         }
 
+        /// <summary>
+        /// Generates a unique random seat for the provided screening.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="screeningId">The screening ID.</param>
+        /// <param name="seats">The total number of seats in the room.</param>
+        /// <returns>A unique random seat number.</returns>
         private static int GenerateUniqueRandomSeat(CinemanicDbContext dbContext, int screeningId, int seats)
         {
             var random = new Random();
@@ -63,6 +85,11 @@ namespace cinemanic.Data
             return randomSeat;
         }
 
+        /// <summary>
+        /// Calculates the ticket price based on the pricing type.
+        /// </summary>
+        /// <param name="pricingType">The pricing type.</param>
+        /// <returns>The calculated ticket price.</returns>
         private static decimal CalculateTicketPrice(PricingType pricingType)
         {
             var random = new Random();
@@ -78,6 +105,12 @@ namespace cinemanic.Data
             }
         }
 
+        /// <summary>
+        /// Clears pending orders from the database if the number of pending orders is less than the number of account IDs.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="accountIds">The list of account IDs.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private static async Task ClearPendingOrders(CinemanicDbContext dbContext, List<int> accountIds)
         {
             if (dbContext.Orders.Count(o => o.OrderStatus == OrderStatus.PENDING) < accountIds.Count)
@@ -88,6 +121,12 @@ namespace cinemanic.Data
             }
         }
 
+        /// <summary>
+        /// Creates pending orders in the database for the provided account IDs.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="accountIds">The list of account IDs.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         private static async Task CreatePendingOrders(CinemanicDbContext dbContext, List<int> accountIds)
         {
             foreach (var account in accountIds)
@@ -99,6 +138,12 @@ namespace cinemanic.Data
             await dbContext.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Generates future tickets for the provided account IDs.
+        /// </summary>
+        /// <param name="dbContext">The database context.</param>
+        /// <param name="accountIds">The list of account IDs.</param>
+        /// <returns>A list of generated future tickets.</returns>
         private static async Task<List<Ticket>> GenerateFutureTickets(CinemanicDbContext dbContext, List<int> accountIds)
         {
             var random = new Random();

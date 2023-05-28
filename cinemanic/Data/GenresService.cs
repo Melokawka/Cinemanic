@@ -1,14 +1,17 @@
-﻿using Azure;
+﻿using cinemanic.Data.Converters;
 using cinemanic.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using static Bogus.DataSets.Name;
 
 namespace cinemanic.Data
 {
     public class GenresService
     {
+        /// <summary>
+        /// Retrieves the list of genres from an external API and saves them to the database.
+        /// </summary>
+        /// <param name="dbContext">The CinemanicDbContext instance.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public static async Task GetGenres(CinemanicDbContext dbContext)
         {
             string apiEndpoint = $"https://api.themoviedb.org/3/genre/movie/list?api_key=4446cb535a867cc6db4c689c8ebc7d97";
@@ -20,7 +23,7 @@ namespace cinemanic.Data
             {
                 var jsonOptions = new JsonSerializerOptions();
                 jsonOptions.Converters.Add(new GenreConverter());
-                
+
                 var response = await httpClient.GetStringAsync(apiEndpoint);
 
                 if (response == null)
