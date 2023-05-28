@@ -95,6 +95,10 @@ This application focuses on backend. Its purpose is for me to learn ASP .NET MVC
   
   ![ss](./docs/images/home-admin-movie-info.png)
   
+  * Screening creation for an admin:
+  
+  ![ss](./docs/images/screenings-admin-create.png)
+  
   * Shopping cart view:
   
   ![ss](./docs/images/shopping-cart-user.png)
