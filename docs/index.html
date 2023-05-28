@@ -5,9 +5,9 @@
   <head>
     <meta charset="utf-8">
       <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-      <title>This is the HOMEPAGE. </title>
+      <title>Application Business Logic </title>
       <meta name="viewport" content="width=device-width">
-      <meta name="title" content="This is the HOMEPAGE. ">
+      <meta name="title" content="Application Business Logic ">
     
       <link rel="shortcut icon" href="favicon.ico">
       <link rel="stylesheet" href="styles/docfx.vendor.min.css">
@@ -59,13 +59,42 @@
         <div class="article row grid">
           <div class="col-md-10">
             <article class="content wrap" id="_content" data-uid="">
-<h1 id="this-is-the-homepage">This is the <strong>HOMEPAGE</strong>.</h1>
+<h1 id="application-business-logic">Application Business Logic</h1>
 
-<p>Refer to <a href="http://daringfireball.net/projects/markdown/">Markdown</a> for how to write markdown files.</p>
-<h2 id="quick-start-notes">Quick Start Notes:</h2>
+<h2 id="ticket-buying">Ticket Buying</h2>
+<p>The process of purchasing tickets in the application involves the following steps:</p>
 <ol>
-<li>Add images to the <em>images</em> folder if the file is referencing an image.</li>
+<li>The user visits the screening view (<code>/seanse</code>).</li>
+<li>After clicking the button displaying the screening hour on the right side of each screening, the user is sent to the payment form.</li>
+<li>The user can choose a seat and pricing type on the payment form. Any changes to the form trigger a client-side request to the server to retrieve the updated ticket price, which is then displayed at the bottom.</li>
+<li>The select box for selecting a seat number checks if other users haven't already bought a ticket for that seat.</li>
+<li>The ticket price depends on various factors, such as the release date of the movie, whether it is for mature audiences, whether it is in 3D, the proximity of the seat to the back of the room, and the remaining number of seats.</li>
+<li>After accepting the form, the user is redirected back to the screening view, and the selected ticket is added to the shopping cart. The number of tickets in the cart is visible on the navbar cart icon. The number is retrieved on the client-side from the server.</li>
+<li>Tickets can be removed from the shopping cart by clicking the &quot;Remove Ticket&quot; button.</li>
+<li>If someone pays for a ticket for a specific seat, all unpaid tickets for that seat are removed from all users.</li>
+<li>Orders have three states: PENDING, SUBMITTED, and COMPLETED.</li>
+<li>If a user has no tickets in the shopping cart and adds a ticket, a new order is created with the PENDING status. Each user can only have one PENDING order.</li>
+<li>Shopping cart displays the PENDING order for the user</li>
+<li>If there is a movie for adults in the shopping cart, information about mature content will appear at the bottom.</li>
+<li>The user's date of birth is stored in the authorization cookie <code>_auth</code>. If a minor tries to pay for an order containing mature content, they will be presented with a warning view.</li>
+<li>After clicking &quot;Submit&quot; in the shopping cart, the order status changes to SUBMITTED, and the user is redirected to the Stripe payment page.</li>
+<li>If the user doesn't complete the payment, they can finish the payment process in the accounts view, specifically the &quot;Orders&quot; accordion tab.</li>
+<li>After successfully paying for the order, the user is redirected to the <code>/platnosc/potwierdzenie</code> view, which displays all the purchased tickets.</li>
+<li>Upon redirecting to this view, the PaymentController retrieves the session ID from Stripe to safely retrieve the order ID, preventing unauthorized access to the endpoint or providing a custom order ID.</li>
+<li>Active tickets are accessible in the accounts view, specifically the &quot;Bilety&quot; accordion tab.</li>
 </ol>
+<h2 id="ticket-and-screening-archivization">Ticket and Screening Archivization</h2>
+<p>The archivization process for tickets and screenings is as follows:</p>
+<ol>
+<li>15 seconds after the application starts, the <code>TicketArchiveHostedService</code> proceeds to archive all screenings and tickets with a <code>ScreeningDate</code> older than the current time.</li>
+<li>Old tickets are first added to the archived tables, and after saving them (to avoid interference with related tables by Entity Framework), they are removed from the original table.</li>
+<li>Tickets that were not purchased are deleted during this process by checking the <code>IsActive</code> property.</li>
+<li>The service runs every 24 hours.</li>
+</ol>
+<h2 id="decrementing-seats-left-on-ticket-creation">Decrementing Seats Left on Ticket Creation</h2>
+<p>The <code>AlterTicketTriggerDecrementSeats</code> migration adds a trigger that decrements the number of available seats for a given screening. The trigger works for seeded tickets, but an update to the trigger is needed to handle cases when tickets are bought.</p>
+<h2 id="updating-order-total-price-on-ticket-creation">Updating Order Total Price on Ticket Creation</h2>
+<p>The <code>AlterTicketTrigger</code> migration adds a trigger that calculates the total price of the order after a ticket is added to the shopping cart (on insert to the <code>tickets</code> table).</p>
 </article>
           </div>
 
