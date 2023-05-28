@@ -5,7 +5,7 @@ The in-depth documentation created with the help of DocFX can be found here: htt
 <br/>
 
 The application focuses on the backend side. Its purpose is for me to learn ASP .NET MVC Framework and test: 
-* Wordpress API (managing and creating newses about the cinema), 
+* Wordpress API (managing and creating news about the cinema), 
 * Stripe API (payment system),
 * The Movie Database API (randomly retrieving movie information),
 * Docker (simplifying app deployment)
@@ -47,14 +47,14 @@ The application focuses on the backend side. Its purpose is for me to learn ASP 
   
     <details>
       <summary>The CSV looks like this:</summary>
-      ![ss](./images/csv-example.png)
+      <img src="./images/csv-example.png" alt="CSV Example" />
     </details>
   
   * The admin can generate and download a PDF with a report on the past year's financial results.
   
     <details>
-      <summary>The PDF looks like this:</summary>
-      ![ss](./images/pdf-example.png)
+        <summary>The PDF looks like this:</summary>
+        <img src="./images/pdf-example.png" alt="PDF Example" />
     </details>
   
 </details>
