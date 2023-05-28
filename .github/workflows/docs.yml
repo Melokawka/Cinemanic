@@ -35,8 +35,8 @@ jobs:
         args: install docfx
 
     - name: DocFX Build
-      working-directory: cinemanic/docs
-      run: docfx .\docfx.json
+      working-directory: cinemanic
+      run: docfx ./docs/docfx.json
       continue-on-error: false
     
     - name: Publish
