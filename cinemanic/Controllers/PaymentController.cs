@@ -82,6 +82,10 @@ namespace cinemanic.Controllers
                 ticket.IsActive = true;
             }
 
+            _dbContext.Update(order);
+
+            _dbContext.SaveChanges();
+
             List<Ticket> unpaidTicketsForDeletion = new();
             foreach (Ticket ticket in order.Tickets)
             {

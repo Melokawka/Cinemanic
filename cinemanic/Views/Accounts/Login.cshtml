@@ -1,5 +1,7 @@
 ﻿@model LoginViewModel
 
+<h2>Logowanie</h2>
+<hr />
 @using (Html.BeginForm("Login", "Accounts", FormMethod.Post))
 {
     <div class="form-group">
@@ -7,12 +9,13 @@
         @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
     </div>
     <div class="form-group">
-        @Html.LabelFor(m => m.Password)
+        @Html.LabelFor(m => m.Password, "Hasło")
         @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
     </div>
     <div class="form-group form-check">
         @Html.CheckBoxFor(m => m.RememberMe, new { @class = "form-check-input" })
-        @Html.LabelFor(m => m.RememberMe, new { @class = "form-check-label" })
+        @Html.LabelFor(m => m.RememberMe, "Zapamiętaj mnie", new { @class = "form-check-label" })
     </div>
-    <button type="submit" class="btn btn-primary">Log in</button>
+    <br/>
+    <button type="submit" class="btn btn-primary">Zaloguj się</button>
 }

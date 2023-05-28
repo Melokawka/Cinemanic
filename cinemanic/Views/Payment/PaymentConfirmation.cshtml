@@ -1,13 +1,13 @@
 ﻿@{
     @model cinemanic.Models.Order
 
-    <h1>Payment Confirmation</h1>
+    <h1>Potwierdzenie Płatności</h1>
 
-    <p>Thank you for your payment. Your order details:</p>
+    <p>Dziękujemy za skorzystanie z naszych usług. Poniżej zamieszczamy szczegóły zamówienia.</p>
 
     <div class="container">
-        <h4>Order ID: @Model.Id</h4>
-        <p>Order Status: @Model.OrderStatus</p>
+        <h4>ID zamówienia: @Model.Id</h4>
+        <p>Status zamówienia: ZAKOŃCZONE</p>
         @{
             int ticketNr = 1;
             <div class="accordion" id="accordion">
