@@ -117,7 +117,9 @@ namespace cinemanic.Controllers
         [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
-            ViewData["MovieId"] = new SelectList(_dbContext.Movies, "Id", "Id");
+            List<Movie> movies = _dbContext.Movies.ToList();
+
+            ViewData["MovieId"] = new SelectList(movies, "Id", "Title");
             ViewData["RoomId"] = new SelectList(_dbContext.Rooms, "Id", "Id");
             return View();
         }
@@ -132,6 +134,9 @@ namespace cinemanic.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,ScreeningDate,Subtitles,Lector,Dubbing,Is3D,SeatsLeft,RoomId,MovieId")] Screening screening)
         {
+            var room = _dbContext.Rooms.FirstOrDefault(r => r.Id == screening.RoomId);
+            screening.SeatsLeft = room.Seats;
+
             _dbContext.Add(screening);
             await _dbContext.SaveChangesAsync();
 
