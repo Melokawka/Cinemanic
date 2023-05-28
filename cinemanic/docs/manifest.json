@@ -1,0 +1,743 @@
+{
+  "homepages": [],
+  "source_base_path": "E:/Kino2/cinemanic",
+  "xrefmap": "xrefmap.yml",
+  "files": [
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.AccountsController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.AccountsController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.HomeController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.HomeController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.OrdersController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.OrdersController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.PaymentController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.PaymentController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.ScreeningsController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.ScreeningsController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.ShoppingCartController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.ShoppingCartController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.TicketsController.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.TicketsController.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Controllers.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Controllers.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.CinemanicDbContext.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.CinemanicDbContext.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Converters.GenreConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Converters.GenreConverter.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Converters.MovieConverter.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Converters.MovieConverter.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Converters.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Converters.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.GenresService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.GenresService.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.IdentityDataInitializer.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.IdentityDataInitializer.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.MovieService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.MovieService.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.PostService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.PostService.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.AccountSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.AccountSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.LikeSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.LikeSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.NewsletterClientSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.NewsletterClientSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.OrderSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.OrderSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.RoomSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.RoomSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.ScreeningSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.ScreeningSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.TicketSeeder.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.TicketSeeder.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.Seeders.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.Seeders.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.StripeProductService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.StripeProductService.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.TicketSeederFunctions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.TicketSeederFunctions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.WordPressSeederService.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.WordPressSeederService.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Data.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Data.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.AddArchivedScreenings.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.AddArchivedScreenings.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.AddTicketTrigger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.AddTicketTrigger.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.AlterTicketTrigger.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.AlterTicketTrigger.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.AlterTicketTriggerDecrementSeats.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.AlterTicketTriggerDecrementSeats.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.UpdateArchivedTicketModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.UpdateArchivedTicketModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.UpdateTicketModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.UpdateTicketModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Migrations.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Migrations.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Account.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Account.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.AccountViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.AccountViewModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.ApplicationRole.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.ApplicationRole.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.ApplicationUser.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.ApplicationUser.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.ArchivedScreening.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.ArchivedScreening.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.ArchivedTicket.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.ArchivedTicket.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.ErrorViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.ErrorViewModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Genre.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Genre.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Like.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Like.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.LoginViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.LoginViewModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Movie.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Movie.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.MovieInfo.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.MovieInfo.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.NewsletterClient.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.NewsletterClient.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Order.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Order.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.OrderStatus.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.OrderStatus.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Post.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Post.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.PostMovieViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.PostMovieViewModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.PricingType.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.PricingType.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.RegisterViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.RegisterViewModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.RenderedProperty.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.RenderedProperty.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Room.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Room.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Screening.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Screening.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.ScreeningViewModel.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.ScreeningViewModel.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.Ticket.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.Ticket.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Models.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Models.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Program.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Program.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Utilities.FinancialReportFunctions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Utilities.FinancialReportFunctions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Utilities.MovieServiceFunctions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Utilities.MovieServiceFunctions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Utilities.ScreeningFunctions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Utilities.ScreeningFunctions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Utilities.ShoppingCartFunctions.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Utilities.ShoppingCartFunctions.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.Utilities.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.Utilities.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "ManagedReference",
+      "source_relative_path": "api/cinemanic.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/cinemanic.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "api/index.md",
+      "output": {
+        ".html": {
+          "relative_path": "api/index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "api/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "api/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "articles/intro.md",
+      "output": {
+        ".html": {
+          "relative_path": "articles/intro.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "articles/toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "articles/toc.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Conceptual",
+      "source_relative_path": "index.md",
+      "output": {
+        ".html": {
+          "relative_path": "index.html"
+        }
+      },
+      "version": ""
+    },
+    {
+      "type": "Toc",
+      "source_relative_path": "toc.yml",
+      "output": {
+        ".html": {
+          "relative_path": "toc.html"
+        }
+      },
+      "version": ""
+    }
+  ],
+  "version_info": {},
+  "groups": [
+    {
+      "xrefmap": "xrefmap.yml"
+    }
+  ]
+}
