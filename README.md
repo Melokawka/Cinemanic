@@ -7,7 +7,7 @@ Business logic documentation and API documentation created with the help of DocF
 
 <br/>
 
-This application focuses on backend. Its purpose is for me to learn ASP .NET MVC Framework and test: 
+This application focuses on backend. Its purpose is for me to learn ASP .NET MVC Framework and to test: 
 * Wordpress API (managing and creating news about the cinema), 
 * Stripe API (payment system),
 * The Movie Database API (randomly retrieving movie information),
@@ -122,29 +122,28 @@ This application focuses on backend. Its purpose is for me to learn ASP .NET MVC
   <summary>Installation</summary>
 
   <br/>
-  
-  You require Docker Desktop app in Linux Containers mode.
-  
-  Make sure your client has free 1433 (database) and 8080 (Wordpress) ports.
 
-  After that you can run the `create-db.bat` script from `./docker scripts` - it will create a container for MSSQL database for this app.
+  1. You require Docker Desktop app in Linux Containers mode.
   
-  Afterwards you can run `wordpress.bat` - it creates containers for the Wordpress server and the MySQL database for it too.
+  2. Make sure your client has free 1433 (database) and 8080 (Wordpress) ports.
   
-  After waiting out around 30 seconds, visit localhost:8080 in order to install Wordpress. The installation is trivial.
+  3. Run the `create-db.bat` script from `./docker scripts`. It will create a container for MSSQL database for this app.
   
-  After installing Wordpress run `wordpress-after-install.bat` and then `wordpress-after-install2.bat`.
+  4. Run `wordpress.bat`. It creates containers for the Wordpress server and the MySQL database for it too.
   
-  Then go to localhost:8080/wp-admin -> `Settings` -> `Permalinks`. Make sure %postname% tag is selected (otherwise wp-json endpoint wont work).
+  5. After waiting for around 30 seconds, visit `localhost:8080` in order to install Wordpress. The installation is trivial.
   
-  Go to `Plugins` and install `WordPress REST API Authentication` by miniOrange.
+  6. Run `wordpress-after-install.bat` and then `wordpress-after-install2.bat`.
   
-  In `Plugins` tab select `Configure` under the newly installed plugin. Activate JWT token authorization and save the generated token.
-
-  Insert the token for Wordpress API in `./cinemanic/appsettings.secrets.json` of the project.
-  This is required for accessing the Wordpress API for retrieving posts and uploading media.
+  7. Go to `localhost:8080/wp-admin` -> `Settings` -> `Permalinks`. Make sure `%postname%` tag is selected (otherwise wp-json endpoint won't work).
   
-  After you make sure the containers are running, you can go ahead and run the project in Visual Studio 
-  (the Docker launch option doesnt work, use the default `cinemanic` launch option).
+  8. Install `WordPress REST API Authentication` by miniOrange from the `Plugins` tab.
+  
+  9. Select `Configure` under the newly installed plugin in the `Plugins` tab. Activate JWT token authorization and save the generated token.
+  
+  10. Insert the token for Wordpress API in `./cinemanic/appsettings.secrets.json` of the project. This is required for accessing the Wordpress API for retrieving posts and uploading media.
+  
+  11. Ensure the containers are running, then you can go ahead and run the project in Visual Studio (use the default `cinemanic` launch option, as the Docker launch option may not work).
   
 </details>
+
